@@ -20,7 +20,7 @@ body{
     overflow-x: hidden;
     overflow-y: scroll;
     justify-content: center;
-    align-items: center;
+    align-items: start;
 }
 
 #search-bar{
@@ -28,7 +28,7 @@ body{
     display: flex;
     align-items: center;
     justify-content: center;
-    top: 90px;
+    top: 70px;
     width: 90%;
     border-radius: 30px;
     outline: solid;
@@ -41,8 +41,8 @@ body{
     display: flex;
     align-items: center;
     justify-content: center;
-    top: 30px;
-    right: 30px;
+    top: 20px;
+    right: 20px;
     padding: 10px;
     border-radius: 20px;
     outline: solid;
@@ -57,14 +57,6 @@ body{
 
 #buscador{
     width: 100%;
-    padding: 7px;
-    font-size: 20px;
-    border-radius: 20px;
-    margin: 5px;
-    background-color: rgba(255, 255, 255, 0.5);
-}
-
-#borrar{
     padding: 7px;
     font-size: 20px;
     border-radius: 20px;
