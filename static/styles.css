@@ -28,13 +28,14 @@ body{
     display: flex;
     align-items: center;
     justify-content: center;
-    top: 20px;
+    top: 15px;
     left: 10px;
     width: 70%;
     border-radius: 30px;
     outline: solid;
     background-color: rgba(0, 64, 255, 0.5);
     visibility: hidden;
+    z-index: 1;
 }
 
 #lupa{
@@ -42,18 +43,19 @@ body{
     display: flex;
     align-items: center;
     justify-content: center;
-    top: 20px;
-    right: 20px;
+    top: 15px;
+    right: 15px;
     padding: 10px;
     border-radius: 20px;
     outline: solid;
-    background-color: rgb(0, 64, 255);
+    background-color: rgba(0, 64, 255, 0.75);
     transition: all 0.5s ease;
     user-select: none;
+    z-index: 1;
 }
 
 #lupa:hover{
-    background-color: rgb(0, 145, 255);
+    background-color: rgb(0, 145, 255, 0.75);
 }
 
 #buscador{
