@@ -28,7 +28,7 @@ body{
     display: flex;
     align-items: center;
     justify-content: center;
-    top: 70px;
+    bottom: 70px;
     width: 90%;
     border-radius: 30px;
     outline: solid;
@@ -41,7 +41,7 @@ body{
     display: flex;
     align-items: center;
     justify-content: center;
-    top: 20px;
+    bottom: 20px;
     right: 20px;
     padding: 10px;
     border-radius: 20px;
