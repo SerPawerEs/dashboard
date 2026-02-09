@@ -19,8 +19,8 @@ body{
     margin: 0px;
     overflow-x: hidden;
     overflow-y: scroll;
-    justify-content: center;
-    align-items: start;
+    justify-content: start;
+    align-items: center;
 }
 
 #search-bar{
