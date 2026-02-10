@@ -25,7 +25,7 @@ body{
 
 #search-bar{
     position: absolute;
-    display: flex;
+    display: none;
     align-items: center;
     justify-content: center;
     top: 8px;
@@ -34,8 +34,18 @@ body{
     border-radius: 30px;
     outline: solid;
     background-color: rgba(0, 64, 255, 0.5);
-    visibility: hidden;
     z-index: 1;
+}
+
+#borrar{
+    width: 5%;
+    padding: 7px;
+    font-size: 15px;
+    border-radius: 20px;
+    margin: 5px;
+    background-color: rgba(255, 255, 255, 0.5);
+    text-align: center;
+    outline-style: solid;
 }
 
 #lupa{
@@ -119,4 +129,27 @@ body{
 
 .content::before{
     content: '🔗';
+}
+
+
+@keyframes intro1 {
+    0% {
+        opacity: 0;
+        transform: translate(100px, 0px);
+    }
+    100% {
+        opacity: 1;
+        transform: translate(0, 0);
+    }
+}
+
+@keyframes outro1 {
+    0% {
+        opacity: 1;
+        transform: translate(0, 0);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(100px, 0);
+    }
 }

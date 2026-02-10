@@ -1,11 +1,22 @@
-const buscador = document.getElementById('buscador');
-const enlaces = document.querySelectorAll('.content');
+const buscador = document.getElementById('buscador')
+const enlaces = document.querySelectorAll('.content')
 const lupa = document.getElementById('lupa')
-const searchbar = document.getElementById('search-bar');
+const searchbar = document.getElementById('search-bar')
+const borrar = document.getElementById('borrar');
 
 
 buscador.addEventListener('input', function() {
-    const termino = this.value.toLowerCase().trim();
+    buscar()
+})
+
+
+borrar.addEventListener('click', () => {
+    buscador.value = ''
+    buscar()
+})
+
+function buscar() {
+    const termino = buscador.value.toLowerCase().trim();
     
     enlaces.forEach(enlace => {
         const texto = enlace.textContent.toLowerCase();
@@ -16,13 +27,20 @@ buscador.addEventListener('input', function() {
             enlace.style.display = 'none';
         }
     })
-})
-
+}
 
 lupa.addEventListener('click', () => {
-    if (searchbar.style.visibility == 'visible'){
-        searchbar.style.visibility = 'hidden'
+    if (searchbar.style.display == 'flex'){
+        searchbar.style.animation = 'outro1 0.3s ease'
+        setTimeout(() => {
+            searchbar.style.animation = 'none'
+            searchbar.style.display = 'none'
+        }, 200);
     }else{
-        searchbar.style.visibility = 'visible'
+        searchbar.style.animation = 'intro1 0.3s ease'
+        searchbar.style.display = 'flex'
+        setTimeout(() => {
+            searchbar.style.animation = 'none'
+        }, 200);
     }
 })
