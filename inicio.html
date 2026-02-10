@@ -3,23 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inicio</title>
+    <title>Dashboard Page</title>
     <link rel="stylesheet" href="static/styles.css">
 </head>
 <body>
-    <div class="container">
+    <form onsubmit="acces(event)" class="join" id="joinform">
+        <input class="pass" type="password" id="contraseña" placeholder="Contraseña" maxlength="30" autocomplete="off" required>
+        <button class="btn" type="button" onclick="toggle()">Ver</button>
+        <button class="btn" type="submit">Continuar</button>
+    </form>
+    <div class="container" id="container">
         <div id="search-bar">
-            <input type="text" placeholder="Search" id="buscador" maxlength="50">
+            <input type="text" placeholder="Search" id="buscador" maxlength="50" autocomplete="off">
             <div id="borrar">X</div>
         </div>
         <div id="lupa">🔍</div>
+        <div id="salir">✖️</div>
 
         <div class="title">Colegio 🏫</div>
         <a href="https://www.sagradocorazon.edu.co/agenda-undecimo-b/" class="content">Agenda</a>
         <a href="https://edi-unoi-co.stn-neds.com/ts/view/access" class="content">Santillana</a>
         <div class="title">Tareas 📚</div>
+        <a href="https://cafeteramovil1.blogspot.com" class="content">Blog Informatica</a>
         <div class="title">Juegos 🎮</div>
+        <a href="https://roblox.com" class="content">Roblox</a>
         <div class="title">Personal 🔓</div>
+        <a href="https://gmail.com" class="content">Gmail ✉️</a>
+        <a href="https://onedrive.live.com" class="content">One Drive ☁️</a>
+        <a href="https://youtube.com" class="content">YouTube ▶️</a>
+        <a href="https://web.whatsapp.com" class="content">Whatsapp Web 🟢</a>
+        <a href="https://chatgpt.com" class="content">Chat gpt 🔳</a>
         <a href="https://serpaweres.github.io/start" class="content">Start</a>
         <a href="https://serpaweres.github.io/sanvalentin" class="content">San Valentin</a>
         <a href="https://corform.onrender.com" class="content">Corform</a>
