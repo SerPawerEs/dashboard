@@ -7,6 +7,7 @@ const contraseña = document.getElementById('contraseña')
 const joinform = document.getElementById('joinform')
 const container = document.getElementById('container')
 const salir = document.getElementById('salir')
+const notas = document.getElementById('notas')
 const pwsa = '25565'
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -14,6 +15,10 @@ document.addEventListener('DOMContentLoaded', () => {
         container.style.display = 'flex'
         joinform.style.display = 'none'
     }
+
+    enlaces.forEach(enlace => {
+        enlace.target = '_blank'
+    })
 })
 
 function acces(event) {
@@ -28,6 +33,10 @@ function acces(event) {
         window.location.href = window.location.href
     }
 }
+
+notas.addEventListener('click', () => {
+    window.location.href = 'notas.html'
+})
 
 salir.addEventListener('click', () => {
     window.location.href = window.location.href
@@ -54,7 +63,6 @@ borrar.addEventListener('click', () => {
 
 function buscar() {
     const termino = buscador.value.toLowerCase().trim();
-    
     enlaces.forEach(enlace => {
         const texto = enlace.textContent.toLowerCase();
         
