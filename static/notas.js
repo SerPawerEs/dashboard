@@ -163,9 +163,6 @@ db.ref('notas').on('value', (data) => {
             }
             strong.textContent = `${val.title}`
             txtmd.textContent = `${val.note}`
-            console.log(val.title)
-            console.log(val.note)
-            console.log(key)
 
             list.appendChild(cont)
             cont.appendChild(txttit)
