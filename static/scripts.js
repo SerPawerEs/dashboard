@@ -9,7 +9,7 @@ const container = document.getElementById('container')
 const salir = document.getElementById('salir')
 const notas = document.getElementById('notas')
 const pwsa = '25565'
-const version = '1.0.0'
+const version = '1.0.1'
 
 
 console.log('version: ', version)

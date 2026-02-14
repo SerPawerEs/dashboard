@@ -18,7 +18,7 @@
         <div style="font-size: 20px; font-family: 'Courier New', Courier, monospace; color: white; padding: 10px;" onclick="Alternar(addnote)">Nueva nota - X</div>
         <form style="display: flex; flex-direction: column; width: 90%;" onsubmit="event.preventDefault();subir()">
             <input style="border-radius: 20px; padding: 10px; margin: 5px;" type="text" placeholder="Titulo" id="txttitulo" required autocomplete="off">
-            <textarea style="border-radius: 20px; padding: 10px; margin: 5px; height: 30dvh;" placeholder="Nota" id="txttext" required></textarea>
+            <textarea style="border-radius: 20px; padding: 10px; margin: 5px; height: 30dvh;" placeholder="Nota" id="txttext" required spellcheck="false"></textarea>
             <button style="border-radius: 20px; padding: 10px; margin: 5px;" type="submit" onclick="Alternar(addnote)">Guardar</button>
         </form>
     </div>
@@ -26,7 +26,7 @@
         <div style="font-size: 20px; font-family: 'Courier New', Courier, monospace; color: white; padding: 10px;" onclick="Alternar(editdiv)">Editar nota - X</div>
         <form style="display: flex; flex-direction: column; width: 90%;" onsubmit="event.preventDefault;seditar()">
             <input style="border-radius: 20px; padding: 10px; margin: 5px;" type="text" placeholder="Titulo" id="edittitulo" required autocomplete="off">
-            <textarea style="border-radius: 20px; padding: 10px; margin: 5px; height: 30dvh;" placeholder="Nota" id="edittext" required></textarea>
+            <textarea style="border-radius: 20px; padding: 10px; margin: 5px; height: 30dvh;" placeholder="Nota" id="edittext" required spellcheck="false"></textarea>
             <button style="border-radius: 20px; padding: 10px; margin: 5px;" type="submit" onclick="Alternar(editdiv)">Guardar</button>
         </form>
     </div>
