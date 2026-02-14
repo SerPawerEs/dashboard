@@ -73,6 +73,20 @@ body{
     align-items: center;
 }
 
+.note-container{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100dvh;
+    padding-top: 55px;
+    padding-bottom: 20px;
+    margin: 0px;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    justify-content: start;
+    align-items: center;
+}
+
 #search-bar{
     position: absolute;
     display: none;
@@ -225,6 +239,73 @@ body{
 }
 
 
+.content-note{
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    width: 70%;
+    padding: 5px;
+    margin: 5px;
+    border-radius: 15px;
+    outline-style: solid;
+    text-decoration: none;
+    font-size: 15px;
+    color: black;
+
+    background: linear-gradient(135deg, rgb(0, 183, 255), rgb(126, 126, 255), rgb(0, 183, 255));
+    background-size: 200%;
+    background-position: 0%;
+    transition: all 0.4s ease;
+    max-width: 300PX;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
+}
+
+.content-note:hover{
+    background-position: 100%;
+}
+
+
+#addnote{
+    display: none;
+    flex-direction: column;
+    position: absolute;
+    width: 70%;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    padding: 5px;
+    margin: 5px;
+    border-radius: 15px;
+    outline-style: solid;
+    z-index: 2;
+
+    background: linear-gradient(135deg, rgb(0, 183, 255), blue, rgb(0, 183, 255));
+    background-size: 200%;
+    background-position: 0%;
+    transition: all 0.4s ease;
+}
+
+#editnote{
+    display: none;
+    flex-direction: column;
+    position: absolute;
+    width: 70%;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    padding: 5px;
+    margin: 5px;
+    border-radius: 15px;
+    outline-style: solid;
+    z-index: 1;
+
+    background: linear-gradient(135deg, rgb(0, 183, 255), blue, rgb(0, 183, 255));
+    background-size: 200%;
+    background-position: 0%;
+    transition: all 0.4s ease;
+}
+
 @keyframes intro1 {
     0% {
         opacity: 0;
@@ -244,5 +325,24 @@ body{
     100% {
         opacity: 0;
         transform: translate(100px, 0);
+    }
+}
+
+
+@keyframes intro2 {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes outro2 {
+    0% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
     }
 }

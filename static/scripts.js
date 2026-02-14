@@ -54,13 +54,10 @@ function toggle() {
 buscador.addEventListener('input', function() {
     buscar()
 })
-
-
 borrar.addEventListener('click', () => {
     buscador.value = ''
     buscar()
 })
-
 function buscar() {
     const termino = buscador.value.toLowerCase().trim();
     enlaces.forEach(enlace => {
