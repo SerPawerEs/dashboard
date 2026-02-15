@@ -23,12 +23,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 })
 //Functions
-borrar.addEventListener('click', () => {
-    buscador.value = ''
-    buscarTexto()
-})
 
 //Buscar
+
 document.addEventListener('DOMContentLoaded', () => {
     const inputBuscador = document.getElementById('buscador');
     const form = inputBuscador ? inputBuscador.closest('form') : null;
@@ -59,7 +56,7 @@ function buscarTexto() {
 
     detailsList.forEach(details => {
         const summary = details.querySelector('summary');
-        const contentDivs = details.querySelectorAll('div'); // todos los <div> dentro
+        const contentDivs = details.querySelectorAll('p'); // todos los <div> dentro
 
         let summaryText = '';
         let contentText = '';
@@ -78,6 +75,12 @@ function buscarTexto() {
     });
 }
 
+
+//Lupa
+borrar.addEventListener('click', () => {
+    buscador.value = ''
+    buscarTexto()
+})
 
 lupa.addEventListener('click', () => {
     if (searchbar.style.display == 'flex'){
