@@ -14,9 +14,12 @@ const addnote = document.getElementById('addnote')
 const editdiv = document.getElementById('editnote')
 const wtitulo = document.getElementById('edittitulo')
 const wtexto = document.getElementById('edittext')
+
+const fecha = new Date()
+const hoy = `${fecha.getUTCDate()}/${fecha.getUTCMonth()+1}/${fecha.getFullYear()}`
 //Acces
 document.addEventListener('DOMContentLoaded', () => {
-    if (localStorage.getItem('sesion') == 'open'){
+    if (localStorage.getItem('sesion') == hoy){
         console.log('Registered')
     }else{
         window.location.href = 'inicio.html'
@@ -101,11 +104,11 @@ lupa.addEventListener('click', () => {
 //Fin Buscar
 
 notas.addEventListener('click', () => {
-    Alternar(addnote)
+    Alternar(addnote, editdiv)
 })
 
 
-function Alternar(pantalla){
+function Alternar(pantalla, pantalla2){
     if (pantalla.style.display == 'flex'){
         pantalla.style.animation = 'outro2 0.3s ease'
         setTimeout(() => {
@@ -118,6 +121,13 @@ function Alternar(pantalla){
         setTimeout(() => {
             pantalla.style.animation = 'none'
         }, 200);
+        if (pantalla2.style.display == 'flex') {
+            pantalla2.style.animation = 'outro2 0.3s ease'
+            setTimeout(() => {
+                pantalla2.style.animation = 'none'
+                pantalla2.style.display = 'none'
+            }, 200);
+        }
     }
 }
 
@@ -144,7 +154,7 @@ db.ref('notas').on('value', (data) => {
     list.innerHTML = ""
     const datos = data.val()
     if(datos){
-        Object.entries(datos).forEach(([key, val]) => {
+        Object.entries(datos).toReversed().forEach(([key, val]) => {
             const cont = document.createElement('details')
             const txttit = document.createElement('summary')
             const txtmd = document.createElement('p')
@@ -178,7 +188,7 @@ db.ref('notas').on('value', (data) => {
 })
 
 function editar(key, titulo, texto){
-    Alternar(editdiv)
+    Alternar(editdiv, addnote)
 
     wtitulo.value = titulo
     wtexto.value = texto

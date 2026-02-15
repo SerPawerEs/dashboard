@@ -9,12 +9,15 @@ const container = document.getElementById('container')
 const salir = document.getElementById('salir')
 const notas = document.getElementById('notas')
 const pwsa = '25565'
-const version = '1.0.1'
+const fecha = new Date()
+const hoy = `${fecha.getUTCDate()}/${fecha.getUTCMonth()+1}/${fecha.getFullYear()}`
+
+const version = '1.0.2'
 
 
 console.log('version: ', version)
 document.addEventListener('DOMContentLoaded', () => {
-    if (localStorage.getItem('sesion') == 'open'){
+    if (localStorage.getItem('sesion') == hoy){
         container.style.display = 'flex'
         joinform.style.display = 'none'
     }
@@ -30,7 +33,7 @@ function acces(event) {
     if (contenido == pwsa){
         container.style.display = 'flex'
         joinform.style.display = 'none'
-        localStorage.setItem('sesion', 'open')
+        localStorage.setItem('sesion', hoy)
     }else{
         alert('Contraseña incorrecta')
         window.location.href = window.location.href
