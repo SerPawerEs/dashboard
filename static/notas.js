@@ -148,6 +148,7 @@ function subir(){
         titulo.value = ''
         msg.value = ''
     }
+    Alternar(addnote)
 }
 
 db.ref('notas').on('value', (data) => {
@@ -201,4 +202,5 @@ function seditar() {
         title: wtitulo.value.trim(),
         note: wtexto.value.trim()
     })
+    Alternar(editdiv)
 }
