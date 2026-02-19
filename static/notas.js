@@ -163,15 +163,17 @@ db.ref('notas').on('value', (data) => {
             cont.className = 'content-note'
             const delbtn = document.createElement('button')
             delbtn.textContent = 'Eliminar'
-            delbtn.style = 'border-radius: 20px; padding: 5px; margin: 5px;'
+            delbtn.style = 'border-radius: 20px; padding: 5px; margin: 5px; background: linear-gradient(135deg, rgb(255, 0, 0), rgb(255, 255, 255), rgb(255, 0, 0));'
             delbtn.onclick = function() {
-                db.ref('/notas/' + key).remove()
-                console.log('btn', key, 'presonado')
+                if(confirm('Vas a eliminar este elemento para siempre, ¿Continuar?')){
+                    db.ref('/notas/' + key).remove()
+                    console.log('btn', key, 'presonado')
+                }
             }
 
             const editbtn = document.createElement('button')
             editbtn.textContent = 'Editar'
-            editbtn.style = 'border-radius: 20px; padding: 5px; margin: 5px;'
+            editbtn.style = 'border-radius: 20px; padding: 5px; margin: 5px; background: linear-gradient(135deg, rgb(38, 0, 255), rgb(255, 255, 255), rgb(38, 0, 255));'
             editbtn.onclick = function() {
                 editar(key, val.title, val.note)
             }
