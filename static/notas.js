@@ -158,6 +158,7 @@ db.ref('notas').on('value', (data) => {
         Object.entries(datos).toReversed().forEach(([key, val]) => {
             const cont = document.createElement('details')
             const txttit = document.createElement('summary')
+            txttit.style = 'text-decoration: underline;'
             const txtmd = document.createElement('p')
             const strong = document.createElement('strong')
             cont.className = 'content-note'
