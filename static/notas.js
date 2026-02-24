@@ -162,6 +162,7 @@ db.ref('notas').on('value', (data) => {
             const txtmd = document.createElement('p')
             const strong = document.createElement('strong')
             cont.className = 'content-note'
+
             const delbtn = document.createElement('button')
             delbtn.textContent = 'Eliminar'
             delbtn.style = 'border-radius: 20px; padding: 5px; margin: 5px; background: linear-gradient(135deg, rgb(255, 0, 0), rgb(255, 255, 255), rgb(255, 0, 0));'

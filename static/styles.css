@@ -253,6 +253,7 @@ body{
     text-decoration: none;
     font-size: 15px;
     color: black;
+    user-select: text;
 
     background: linear-gradient(135deg, rgb(0, 183, 255), rgb(126, 126, 255), rgb(0, 183, 255));
     background-size: 200%;
