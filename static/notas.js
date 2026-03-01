@@ -15,6 +15,9 @@ const editdiv = document.getElementById('editnote')
 const wtitulo = document.getElementById('edittitulo')
 const wtexto = document.getElementById('edittext')
 
+const preview = document.getElementById('preview')
+const previewimg = document.getElementById('previewimg')
+
 const fecha = new Date()
 const hoy = `${fecha.getUTCDate()}/${fecha.getUTCMonth()+1}/${fecha.getFullYear()}`
 //Acces
@@ -26,6 +29,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 })
 //Functions
+
+function delPreview() {
+    previewimg.scr = ''
+    preview.style.display = 'none'
+}
+
 
 //Buscar
 
@@ -135,7 +144,8 @@ salir.addEventListener('click', () => {
     window.location.href = 'inicio.html'
 })
 
-//Database
+//Database ----------------------------------------------
+
 const dbURL = 'https://database-3c232-default-rtdb.firebaseio.com/'
 firebase.initializeApp({databaseURL:dbURL})
 const db = firebase.database()
@@ -189,7 +199,8 @@ db.ref('notas').on('value', (data) => {
                     img.src = imgSrc
                     img.style = 'max-width: 200px; max-height: 200px; border-radius: 10px; border: 1px solid #ddd; cursor: pointer; transition: transform 0.2s;'
                     img.onclick = function() {
-                        window.open(imgSrc, '_blank')
+                        preview.style.display = 'flex'
+                        previewimg.src = imgSrc
                     }
                     imgContainer.appendChild(img)
                 })
@@ -209,14 +220,13 @@ db.ref('notas').on('value', (data) => {
 
 
 // ==========================================
-// VARIABLES GLOBALES
+// VARIABLES SEPARADAS PARA EDICIÓN
 // ==========================================
-let archivosParaEnviarEdit = [];
-let imagenesExistentes = [];
-let keyActual = null;
+let archivosEditar = [];
+let imagenesExistentes = []; // Para guardar las URLs base64 existentes
 
 // ==========================================
-// FUNCIÓN EDITAR (SE LLAMA DESDE EL BOTÓN EDITAR)
+// FUNCIÓN EDITAR (CARGA DATOS + IMÁGENES)
 // ==========================================
 function editar(key, titulo, texto, imagenes = []) {
     Alternar(editdiv, addnote)
@@ -225,30 +235,25 @@ function editar(key, titulo, texto, imagenes = []) {
     document.getElementById('edittext').value = texto
     
     // Guardar key y imágenes existentes
-    keyActual = key
-    imagenesExistentes = [...imagenes] // Copia del array
-    archivosParaEnviarEdit = [] // Nuevas imágenes vacías
+    editdiv.className = key
+    imagenesExistentes = imagenes || []
     
-    // Limpiar y mostrar galería de edición
-    const galeriaEdit = document.getElementById('galeriaEdit')
-    galeriaEdit.innerHTML = ''
+    // Limpiar array de nuevas imágenes y galería
+    archivosEditar = []
+    document.getElementById('editgaleria').innerHTML = ''
     
     // Mostrar imágenes existentes
-    if(imagenes && imagenes.length > 0) {
-        imagenes.forEach((imgSrc, index) => {
+    if(imagenesExistentes.length > 0) {
+        imagenesExistentes.forEach((imgSrc, index) => {
             mostrarImagenExistente(imgSrc, index)
         })
     }
-    
-    editdiv.className = key
 }
 
 // ==========================================
-// MOSTRAR IMÁGEN EXISTENTE (CON BOTÓN ELIMINAR)
+// MOSTRAR IMÁGENES EXISTENTES (CON X PARA ELIMINAR)
 // ==========================================
 function mostrarImagenExistente(imgSrc, index) {
-    const galeriaEdit = document.getElementById('galeriaEdit')
-    
     const card = document.createElement('div')
     card.style.cssText = 'position: relative; width: 100px; height: 120px; border: 1px solid #ddd; border-radius: 5px; overflow: hidden; display: inline-block; margin: 5px; background: #fff;'
     
@@ -266,45 +271,86 @@ function mostrarImagenExistente(imgSrc, index) {
     btnDelete.style.cssText = 'position: absolute; top: 5px; right: 5px; background: rgba(255, 0, 0, 0.9); color: white; border: none; border-radius: 50%; width: 22px; height: 22px; cursor: pointer; font-size: 16px; line-height: 1; z-index: 10;'
     
     btnDelete.onclick = () => {
-        galeriaEdit.removeChild(card)
-        // Eliminar de imagenesExistentes
+        document.getElementById('editgaleria').removeChild(card)
         imagenesExistentes = imagenesExistentes.filter((_, i) => i !== index)
     }
 
     card.appendChild(btnDelete)
     card.appendChild(img)
     card.appendChild(nombre)
-    galeriaEdit.appendChild(card)
+    document.getElementById('editgaleria').appendChild(card)
 }
 
 // ==========================================
-// GUARDAR EDICIÓN
+// AGREGAR NUEVA IMAGEN A EDICIÓN
+// ==========================================
+function agregarImagenEditar(blob) {
+    archivosEditar.push(blob)
+    mostrarVistaPreviaEditar(blob)
+}
+
+// ==========================================
+// MOSTRAR VISTA PREVIA (NUEVAS IMÁGENES)
+// ==========================================
+function mostrarVistaPreviaEditar(blob) {
+    const reader = new FileReader()
+    reader.onload = (e) => {
+        const card = document.createElement('div')
+        card.style.cssText = 'position: relative; width: 100px; height: 120px; border: 1px solid #00ff00; border-radius: 5px; overflow: hidden; display: inline-block; margin: 5px; background: #fff;'
+        
+        const img = document.createElement('img')
+        img.src = e.target.result
+        img.style.cssText = 'width: 100%; height: 100px; object-fit: cover; display: block;'
+        
+        const nombre = document.createElement('div')
+        nombre.innerText = 'NUEVA: ' + (blob.name || 'imagen.png')
+        nombre.style.cssText = 'font-size: 10px; text-align: center; color: #00aa00; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; padding: 2px 0;'
+        
+        const btnDelete = document.createElement('button')
+        btnDelete.innerHTML = '&times;'
+        btnDelete.type = 'button'
+        btnDelete.style.cssText = 'position: absolute; top: 5px; right: 5px; background: rgba(255, 0, 0, 0.9); color: white; border: none; border-radius: 50%; width: 22px; height: 22px; cursor: pointer; font-size: 16px; line-height: 1; z-index: 10;'
+        
+        btnDelete.onclick = () => {
+            document.getElementById('editgaleria').removeChild(card)
+            archivosEditar = archivosEditar.filter(archivo => archivo !== blob)
+        }
+
+        card.appendChild(btnDelete)
+        card.appendChild(img)
+        card.appendChild(nombre)
+        document.getElementById('editgaleria').appendChild(card)
+    }
+    reader.readAsDataURL(blob)
+}
+
+// ==========================================
+// FUNCIÓN SEDITAR (GUARDA CAMBIOS)
 // ==========================================
 function seditar() {
+    document.getElementById('loading').style.display = 'flex'
     const key = editdiv.className
     const title = document.getElementById('edittitulo').value.trim()
     const note = document.getElementById('edittext').value.trim()
-    
+
     if (title && note) {
         // Si hay nuevas imágenes, convertirlas a Base64
-        if (archivosParaEnviarEdit.length > 0) {
-            convertirImagenesYEditar(key, title, note)
+        if (archivosEditar.length > 0) {
+            convertirImagenesEditar(key, title, note)
         } else {
             // Solo actualizar texto y imágenes existentes
-            guardarEdicionEnFirebase(key, title, note, imagenesExistentes)
+            actualizarNotaFirebase(key, title, note, imagenesExistentes)
         }
-    } else {
-        alert('Por favor escribe un título y un mensaje')
     }
 }
 
 // ==========================================
 // CONVERTIR NUEVAS IMÁGENES A BASE64
 // ==========================================
-function convertirImagenesYEditar(key, title, note) {
+function convertirImagenesEditar(key, title, note) {
     const nuevasImagenesBase64 = []
     
-    const promesas = archivosParaEnviarEdit.map(archivo => {
+    const promesas = archivosEditar.map(archivo => {
         return new Promise((resolve, reject) => {
             const reader = new FileReader()
             
@@ -325,8 +371,8 @@ function convertirImagenesYEditar(key, title, note) {
     Promise.all(promesas)
         .then(() => {
             // Combinar imágenes existentes + nuevas
-            const todasLasImagenes = [...imagenesExistentes, ...nuevasImagenesBase64]
-            guardarEdicionEnFirebase(key, title, note, todasLasImagenes)
+            const todasImagenes = [...imagenesExistentes, ...nuevasImagenesBase64]
+            actualizarNotaFirebase(key, title, note, todasImagenes)
         })
         .catch((error) => {
             console.error('Error en la conversión:', error)
@@ -335,26 +381,26 @@ function convertirImagenesYEditar(key, title, note) {
 }
 
 // ==========================================
-// GUARDAR EDICIÓN EN FIREBASE
+// ACTUALIZAR NOTA EN FIREBASE
 // ==========================================
-function guardarEdicionEnFirebase(key, title, note, imagenesBase64) {
+function actualizarNotaFirebase(key, title, note, imagenes) {
     db.ref('/notas/' + key).update({
         title: title,
         note: note,
-        imagenes: imagenesBase64,
-        cantidadImagenes: imagenesBase64.length
+        imagenes: imagenes,
+        cantidadImagenes: imagenes.length
     })
     .then(() => {
         // Limpiar formulario
         document.getElementById('edittitulo').value = ''
         document.getElementById('edittext').value = ''
-        document.getElementById('inputFileEdit').value = ''
-        archivosParaEnviarEdit = []
+        document.getElementById('editinputFile').value = ''
+        archivosEditar = []
         imagenesExistentes = []
-        document.getElementById('galeriaEdit').innerHTML = ''
+        document.getElementById('editgaleria').innerHTML = ''
         
         Alternar(editdiv)
-        alert('¡Nota actualizada exitosamente!')
+        document.getElementById('loading').style.display = 'none'
     })
     .catch((error) => {
         console.error('Error al actualizar nota:', error)
@@ -363,50 +409,7 @@ function guardarEdicionEnFirebase(key, title, note, imagenesBase64) {
 }
 
 // ==========================================
-// AGREGAR IMAGEN AL ARRAY (NUEVAS IMÁGENES)
-// ==========================================
-function agregarImagen(blob) {
-    archivosParaEnviarEdit.push(blob)
-    mostrarVistaPreviaNueva(blob)
-}
-
-// ==========================================
-// MOSTRAR VISTA PREVIA DE NUEVA IMAGEN
-// ==========================================
-function mostrarVistaPreviaNueva(blob) {
-    const reader = new FileReader()
-    reader.onload = (e) => {
-        const card = document.createElement('div')
-        card.style.cssText = 'position: relative; width: 100px; height: 120px; border: 1px solid #007bff; border-radius: 5px; overflow: hidden; display: inline-block; margin: 5px; background: #fff;'
-        
-        const img = document.createElement('img')
-        img.src = e.target.result
-        img.style.cssText = 'width: 100%; height: 100px; object-fit: cover; display: block;'
-        
-        const nombre = document.createElement('div')
-        nombre.innerText = 'NUEVA'
-        nombre.style.cssText = 'font-size: 10px; text-align: center; color: #007bff; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; padding: 2px 0;'
-        
-        const btnDelete = document.createElement('button')
-        btnDelete.innerHTML = '&times;'
-        btnDelete.type = 'button'
-        btnDelete.style.cssText = 'position: absolute; top: 5px; right: 5px; background: rgba(255, 0, 0, 0.9); color: white; border: none; border-radius: 50%; width: 22px; height: 22px; cursor: pointer; font-size: 16px; line-height: 1; z-index: 10;'
-        
-        btnDelete.onclick = () => {
-            document.getElementById('galeriaEdit').removeChild(card)
-            archivosParaEnviarEdit = archivosParaEnviarEdit.filter(archivo => archivo !== blob)
-        }
-
-        card.appendChild(btnDelete)
-        card.appendChild(img)
-        card.appendChild(nombre)
-        document.getElementById('galeriaEdit').appendChild(card)
-    }
-    reader.readAsDataURL(blob)
-}
-
-// ==========================================
-// EVENTO PASTE (Ctrl + V) - EN EL TEXTAREA DE EDICIÓN
+// EVENTO PASTE (Ctrl + V) - EDICIÓN
 // ==========================================
 document.getElementById('edittext').addEventListener('paste', function(e) {
     const items = e.clipboardData.items
@@ -415,40 +418,35 @@ document.getElementById('edittext').addEventListener('paste', function(e) {
         if (items[i].type.indexOf('image') !== -1) {
             e.preventDefault()
             const blob = items[i].getAsFile()
-            agregarImagen(blob)
+            agregarImagenEditar(blob)
         }
     }
 })
 
 // ==========================================
-// EVENTO INPUT FILE (Seleccionar archivos) - EDICIÓN
+// EVENTO INPUT FILE - EDICIÓN
 // ==========================================
-document.getElementById('inputFileEdit').addEventListener('change', function(e) {
+document.getElementById('editinputFile').addEventListener('change', function(e) {
     const files = e.target.files
     
     for (let i = 0; i < files.length; i++) {
         if (files[i].type.indexOf('image') !== -1) {
-            agregarImagen(files[i])
+            agregarImagenEditar(files[i])
         }
     }
     
     e.target.value = ''
 })
 
-
 //IMAGENES Y SUBIR --------------------------
 
-
-
-// script.js
-
-// Array global para almacenar las imágenes
 
 // ==========================================
 // FUNCIÓN SUBIR (LLAMADA DESDE EL FORMULARIO)
 // ==========================================
 let archivosParaEnviar = [];
 function subir() {
+    document.getElementById('loading').style.display = 'flex'
     const title = document.getElementById('txttitulo').value.trim();
     const note = document.getElementById('txttext').value.trim();
 
@@ -458,8 +456,6 @@ function subir() {
         } else {
             guardarNotaEnFirebase(title, note, []);
         }
-    } else {
-        alert('Por favor escribe un título y un mensaje');
     }
 }
 
@@ -518,12 +514,10 @@ function guardarNotaEnFirebase(title, note, imagenesBase64) {
         
         // Tu función original
         Alternar(addnote);
-        
-        alert('¡Nota guardada exitosamente!');
+        document.getElementById('loading').style.display = 'none'
     })
     .catch((error) => {
         console.error('Error al guardar nota:', error);
-        alert('Error al guardar la nota');
     });
 }
 

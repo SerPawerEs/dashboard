@@ -15,12 +15,21 @@
     <div id="lupa">🔍</div>
     <div id="notas">➕</div>
     <div id="salir">🔙</div>
+    <div id="preview">
+        <button style="border-radius: 50px; background-color: red; position: absolute; top: 5px; right: 5px; border-style: solid; font-size: 30px; width: 50px; height: 50px; z-index: 1;" onclick="delPreview()">X</button>
+        <img style="max-width: 100%; max-height: 100vh; align-items: center; justify-content: center; text-align: center;" id="previewimg">
+    </div>
+    <div id="loading">
+        <div style="font-size: 30px; background-color: rgba(255, 255, 255, 0.75); padding: 5px; border-radius: 5px; animation: loading 2s ease-in-out infinite;">Cargando 📂</div>
+    </div>
     <div id="addnote">
         <div style="font-size: 20px; font-family: 'Courier New', Courier, monospace; color: white; padding: 10px;" onclick="Alternar(addnote)">Nueva nota - X</div>
-        <form style="display: flex; flex-direction: column; width: 90%;" onsubmit="event.preventDefault();subir()">
-            <input style="border-radius: 20px; padding: 10px; margin: 5px;" type="text" placeholder="Titulo" id="txttitulo" required autocomplete="off">
+        <form style="position: relative; display: flex; flex-direction: column; width: 90%;" onsubmit="event.preventDefault();subir()">
+            <div style="display: flex; margin: 5px; align-items: center; justify-content: center;">
+                <input style="border-radius: 20px; padding: 10px; width: 100%;" type="text" placeholder="Titulo" id="txttitulo" required autocomplete="off">  
+                <button type="button" onclick="document.getElementById('inputFile').click()" style="border-radius: 20px; padding: 5px; position: absolute; right: 10px; border-style: dashed;">📸</button>
+            </div>
             <textarea style="border-radius: 20px; padding: 10px; margin: 5px; height: 30vh; font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;" placeholder="Nota" id="txttext" required spellcheck="false"></textarea>
-            <button type="button" onclick="document.getElementById('inputFile').click()" style="border-radius: 10px; padding: 5px; margin: 5px;">📁 Seleccionar archivos</button>
             <input id="inputFile" type="file" multiple accept="image/*" style="display: none;">
             <div id="galeria"></div>
             <button style="border-radius: 20px; padding: 10px; margin: 5px; background: linear-gradient(135deg, rgba(0, 255, 4, 0.75), rgb(255, 255, 255), rgba(0, 255, 4, 0.75));" type="submit">Guardar</button>
@@ -28,13 +37,15 @@
     </div>
     <div id="editnote">
         <div style="font-size: 20px; font-family: 'Courier New', Courier, monospace; color: white; padding: 10px;" onclick="Alternar(editdiv)">Editar nota - X</div>
-        <form style="display: flex; flex-direction: column; width: 90%;" onsubmit="event.preventDefault();seditar()">
-            <input style="border-radius: 20px; padding: 10px; margin: 5px;" type="text" placeholder="Titulo" id="edittitulo" required autocomplete="off">
+        <form style="position: relative; display: flex; flex-direction: column; width: 90%;" onsubmit="event.preventDefault();seditar()">
+            <div style="display: flex; margin: 5px; align-items: center; justify-content: center;">
+                <input style="border-radius: 20px; padding: 10px; width: 100%;" type="text" placeholder="Titulo" id="edittitulo" required autocomplete="off">
+                <button type="button" onclick="document.getElementById('editinputFile').click()" style="border-radius: 20px; padding: 5px; position: absolute; right: 10px; border-style: dashed;">📸</button>
+            </div>
             <textarea style="border-radius: 20px; padding: 10px; margin: 5px; height: 30vh; font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;" placeholder="Nota" id="edittext" required spellcheck="false"></textarea>
-            <button type="button" onclick="document.getElementById('inputFileEdit').click()" style="border-radius: 10px; padding: 5px; margin: 5px;">📁 Seleccionar archivos</button>
-            <input id="inputFileEdit" type="file" multiple accept="image/*" style="display: none;">
-            <div id="galeriaEdit"></div>
-            <button style="border-radius: 20px; padding: 10px; margin: 5px; background: linear-gradient(135deg, rgba(0, 255, 4, 0.75), rgb(255, 255, 255), rgba(0, 255, 4, 0.75));" type="submit">Guardar</button>
+            <input id="editinputFile" type="file" multiple accept="image/*" style="display: none;">    
+            <div id="editgaleria"></div>
+            <button style="border-radius: 20px; padding: 10px; margin: 5px; background: linear-gradient(135deg, rgba(0, 255, 4, 0.75), rgb(255, 255, 255), rgba(0, 2550.75));" type="submit">Guardar</button>
         </form>
     </div>
     <div class="note-container" id="note-container">
@@ -46,3 +57,4 @@
     <script src="static/notas.js"></script>
 </body>
 </html>
+, 4, 

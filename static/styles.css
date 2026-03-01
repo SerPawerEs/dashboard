@@ -99,7 +99,7 @@ body{
     overflow-y: scroll;
 }
 
-#galeriaEdit {
+#editgaleria {
     display: flex;
     flex-wrap: wrap;
     gap: 15px;
@@ -399,6 +399,34 @@ body{
     transform: scale(1.1);
 }
 
+#preview{
+    position: absolute;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    width: 100%;
+    height: 100vh;
+    padding: 0;
+    margin: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1;
+}
+
+#loading{
+    position: absolute;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    width: 100%;
+    height: 100vh;
+    padding: 0;
+    margin: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 3;
+}
+
 @keyframes intro1 {
     0% {
         opacity: 0;
@@ -437,6 +465,18 @@ body{
     }
     100% {
         opacity: 0;
+    }
+}
+
+@keyframes loading {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
     }
 }
 
