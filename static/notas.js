@@ -191,12 +191,6 @@ db.ref('notas').on('value', (data) => {
                     img.onclick = function() {
                         window.open(imgSrc, '_blank')
                     }
-                    img.onmouseover = function() {
-                        this.style.transform = 'scale(1.05)'
-                    }
-                    img.onmouseout = function() {
-                        this.style.transform = 'scale(1)'
-                    }
                     imgContainer.appendChild(img)
                 })
                 
