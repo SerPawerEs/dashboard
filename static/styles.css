@@ -330,26 +330,7 @@ body{
     max-width: 600px;
 }
 
-#editnote{
-    display: none;
-    flex-direction: column;
-    position: absolute;
-    width: 80%;
-    text-align: center;
-    justify-content: center;
-    align-items: center;
-    padding: 5px;
-    margin: 5px;
-    border-radius: 15px;
-    outline-style: solid;
-    z-index: 1;
 
-    background: linear-gradient(135deg, rgb(0, 183, 255), blue, rgb(0, 183, 255));
-    background-size: 200%;
-    background-position: 0%;
-    transition: all 0.4s ease;
-    max-width: 400px;
-}
 
 .imagen-card {
     background: white;
