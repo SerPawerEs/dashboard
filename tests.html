@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subir Imágenes - Pegar o Seleccionar</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background-color: #f4f4f4; }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        h2 { margin-top: 0; color: #333; }
+        
+        #miInput {
+            width: 100%;
+            height: 120px;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+            resize: vertical;
+        }
+        #miInput:focus {
+            border-color: #007bff;
+            outline: none;
+            background-color: #fff;
+        }
+
+        /* Botón para seleccionar archivos */
+        .btn-seleccionar {
+            margin-top: 15px;
+            padding: 12px 24px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: background-color 0.2s;
+        }
+        .btn-seleccionar:hover {
+            background-color: #0056b3;
+        }
+
+        /* Input file oculto */
+        #inputFile {
+            display: none;
+        }
+
+        #galeria {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 20px;
+            min-height: 50px;
+            padding: 10px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            border: 2px dashed #ddd;
+        }
+
+        #galeria:empty::before {
+            content: "Las imágenes aparecerán aquí...";
+            color: #999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100px;
+        }
+
+        .imagen-card {
+            background: white;
+            padding: 5px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            position: relative;
+            width: 150px;
+            height: 150px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transition: transform 0.2s;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .imagen-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .imagen-card img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+
+        .imagen-card .nombre-archivo {
+            font-size: 11px;
+            text-align: center;
+            margin-top: 5px;
+            color: #666;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-eliminar {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background-color: rgba(255, 50, 50, 0.9);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            line-height: 1;
+            transition: background-color 0.2s;
+            z-index: 10;
+        }
+
+        .btn-eliminar:hover {
+            background-color: #ff0000;
+            transform: scale(1.1);
+        }
+
+        .btn-enviar {
+            margin-top: 20px;
+            padding: 12px 24px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            width: 100%;
+        }
+        .btn-enviar:hover { background-color: #218838; }
+        .btn-enviar:disabled { 
+            background-color: #ccc; 
+            cursor: not-allowed; 
+        }
+
+        .info-text {
+            font-size: 14px;
+            color: #666;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>📸 Subir Imágenes</h2>
+    <p class="info-text">Pega con <b>Ctrl + V</b> o selecciona archivos desde tu dispositivo.</p>
+
+    <!-- Input de texto para pegar -->
+    <textarea id="miInput" placeholder="Escribe texto o pega imágenes aquí (Ctrl + V)..."></textarea>
+
+    <!-- Botón para seleccionar archivos -->
+    <button class="btn-seleccionar" onclick="document.getElementById('inputFile').click()">
+        📁 Seleccionar Archivos
+    </button>
+    
+    <!-- Input file oculto (multiple permite seleccionar varios) -->
+    <input type="file" id="inputFile" multiple accept="image/*">
+
+    <!-- Galería de imágenes -->
+    <div id="galeria"></div>
+
+    <!-- Botón de enviar -->
+    <button id="btnEnviar" class="btn-enviar" onclick="enviarTodoAlServidor()" disabled>
+        No hay imágenes
+    </button>
+</div>
+
+<script>
+    const input = document.getElementById('miInput');
+    const inputFile = document.getElementById('inputFile');
+    const galeria = document.getElementById('galeria');
+    const btnEnviar = document.getElementById('btnEnviar');
+    
+    // Array para guardar los archivos reales
+    let archivosParaEnviar = [];
+
+    // ==========================================
+    // 1. EVENTO PASTE (Ctrl + V)
+    // ==========================================
+    input.addEventListener('paste', (event) => {
+        const items = event.clipboardData.items;
+
+        for (let i = 0; i < items.length; i++) {
+            if (items[i].type.indexOf('image') !== -1) {
+                const blob = items[i].getAsFile();
+                agregarImagen(blob);
+            }
+        }
+    });
+
+    // ==========================================
+    // 2. EVENTO SELECCIONAR ARCHIVOS
+    // ==========================================
+    inputFile.addEventListener('change', (event) => {
+        const files = event.target.files;
+        
+        for (let i = 0; i < files.length; i++) {
+            if (files[i].type.indexOf('image') !== -1) {
+                agregarImagen(files[i]);
+            }
+        }
+
+        // Limpiar el input para permitir seleccionar el mismo archivo de nuevo si se elimina
+        inputFile.value = '';
+    });
+
+    // ==========================================
+    // FUNCIÓN COMUN PARA AGREGAR IMÁGENES
+    // ==========================================
+    function agregarImagen(blob) {
+        archivosParaEnviar.push(blob);
+        mostrarVistaPrevia(blob);
+        actualizarEstadoBoton();
+    }
+
+    // ==========================================
+    // MOSTRAR VISTA PREVIA CON BOTÓN ELIMINAR
+    // ==========================================
+    function mostrarVistaPrevia(blob) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const card = document.createElement('div');
+            card.className = 'imagen-card';
+            
+            // Imagen
+            const img = document.createElement('img');
+            img.src = e.target.result;
+            
+            // Nombre del archivo
+            const nombre = document.createElement('div');
+            nombre.className = 'nombre-archivo';
+            nombre.innerText = blob.name || "imagen_pegada.png";
+            nombre.title = blob.name || "imagen_pegada.png";
+
+            // Botón de Eliminar
+            const btnDelete = document.createElement('button');
+            btnDelete.className = 'btn-eliminar';
+            btnDelete.innerHTML = '&times;';
+            btnDelete.title = "Eliminar imagen";
+            
+            btnDelete.onclick = () => {
+                // Eliminar del DOM
+                galeria.removeChild(card);
+                
+                // Eliminar del Array
+                archivosParaEnviar = archivosParaEnviar.filter(archivo => archivo !== blob);
+                
+                actualizarEstadoBoton();
+            };
+
+            card.appendChild(btnDelete);
+            card.appendChild(img);
+            card.appendChild(nombre);
+            galeria.appendChild(card);
+        };
+        reader.readAsDataURL(blob);
+    }
+
+    // ==========================================
+    // ACTUALIZAR ESTADO DEL BOTÓN ENVIAR
+    // ==========================================
+    function actualizarEstadoBoton() {
+        if (archivosParaEnviar.length > 0) {
+            btnEnviar.disabled = false;
+            btnEnviar.innerText = `🚀 Enviar ${archivosParaEnviar.length} imagen(es)`;
+        } else {
+            btnEnviar.disabled = true;
+            btnEnviar.innerText = "No hay imágenes";
+        }
+    }
+
+    // ==========================================
+    // ENVIAR AL SERVIDOR
+    // ==========================================
+    function enviarTodoAlServidor() {
+        if (archivosParaEnviar.length === 0) {
+            alert("No hay imágenes para enviar.");
+            return;
+        }
+
+        console.log("Imágenes a enviar:", archivosParaEnviar);
+        
+        // Preparar FormData
+        const formData = new FormData();
+        archivosParaEnviar.forEach((archivo) => {
+            formData.append('imagenes', archivo); 
+        });
+
+        // EJEMPLO DE ENVÍO CON FETCH
+        /*
+        fetch('/tu-api/subir', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Éxito:', data);
+            alert('¡Imágenes enviadas correctamente!');
+            // Limpiar galería después de enviar
+            archivosParaEnviar = [];
+            galeria.innerHTML = '';
+            actualizarEstadoBoton();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error al enviar las imágenes.');
+        });
+        */
+
+        // Simulación para demo
+        alert(`✅ ¡Listo! Se enviarían ${archivosParaEnviar.length} imágenes al servidor.`);
+    }
+
+    // Inicializar estado
+    actualizarEstadoBoton();
+</script>
+
+</body>
+</html>

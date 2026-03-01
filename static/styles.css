@@ -89,6 +89,26 @@ body{
     align-items: center;
 }
 
+#galeria {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-top: 5px;
+    max-height: 165px;
+    padding-top: 5px;
+    overflow-y: scroll;
+}
+
+#galeriaEdit {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-top: 5px;
+    max-height: 165px;
+    padding-top: 5px;
+    overflow-y: scroll;
+}
+
 #search-bar{
     position: absolute;
     display: none;
@@ -329,6 +349,73 @@ body{
     background-position: 0%;
     transition: all 0.4s ease;
     max-width: 400px;
+}
+
+.imagen-card {
+    background: white;
+    padding: 5px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    position: relative; /* Necesario para posicionar el botón de borrar */
+    width: 150px;
+    height: 150px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transition: transform 0.2s;
+}
+
+.imagen-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.imagen-card img {
+    width: 100%;
+    height: 120px; /* Altura fija para la imagen */
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.imagen-card .nombre-archivo {
+    font-size: 11px;
+    text-align: center;
+    margin-top: 5px;
+    color: #666;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Botón de Eliminar (La X) */
+.btn-eliminar {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background-color: rgba(255, 50, 50, 0.9);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 25px;
+    height: 25px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    line-height: 1;
+    transition: background-color 0.2s;
+    z-index: 10;
+}
+
+.btn-eliminar:hover {
+    background-color: #ff0000;
+    transform: scale(1.1);
 }
 
 @keyframes intro1 {
