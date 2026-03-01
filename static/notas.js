@@ -217,7 +217,7 @@ db.ref('notas').on('value', (data) => {
 // ==========================================
 // VARIABLES GLOBALES
 // ==========================================
-let archivosParaEnviar = [];
+let archivosParaEnviarEdit = [];
 let imagenesExistentes = [];
 let keyActual = null;
 
@@ -233,7 +233,7 @@ function editar(key, titulo, texto, imagenes = []) {
     // Guardar key y imágenes existentes
     keyActual = key
     imagenesExistentes = [...imagenes] // Copia del array
-    archivosParaEnviar = [] // Nuevas imágenes vacías
+    archivosParaEnviarEdit = [] // Nuevas imágenes vacías
     
     // Limpiar y mostrar galería de edición
     const galeriaEdit = document.getElementById('galeriaEdit')
@@ -293,7 +293,7 @@ function seditar() {
     
     if (title && note) {
         // Si hay nuevas imágenes, convertirlas a Base64
-        if (archivosParaEnviar.length > 0) {
+        if (archivosParaEnviarEdit.length > 0) {
             convertirImagenesYEditar(key, title, note)
         } else {
             // Solo actualizar texto y imágenes existentes
@@ -310,7 +310,7 @@ function seditar() {
 function convertirImagenesYEditar(key, title, note) {
     const nuevasImagenesBase64 = []
     
-    const promesas = archivosParaEnviar.map(archivo => {
+    const promesas = archivosParaEnviarEdit.map(archivo => {
         return new Promise((resolve, reject) => {
             const reader = new FileReader()
             
@@ -355,7 +355,7 @@ function guardarEdicionEnFirebase(key, title, note, imagenesBase64) {
         document.getElementById('edittitulo').value = ''
         document.getElementById('edittext').value = ''
         document.getElementById('inputFileEdit').value = ''
-        archivosParaEnviar = []
+        archivosParaEnviarEdit = []
         imagenesExistentes = []
         document.getElementById('galeriaEdit').innerHTML = ''
         
@@ -372,7 +372,7 @@ function guardarEdicionEnFirebase(key, title, note, imagenesBase64) {
 // AGREGAR IMAGEN AL ARRAY (NUEVAS IMÁGENES)
 // ==========================================
 function agregarImagen(blob) {
-    archivosParaEnviar.push(blob)
+    archivosParaEnviarEdit.push(blob)
     mostrarVistaPreviaNueva(blob)
 }
 
@@ -400,7 +400,7 @@ function mostrarVistaPreviaNueva(blob) {
         
         btnDelete.onclick = () => {
             document.getElementById('galeriaEdit').removeChild(card)
-            archivosParaEnviar = archivosParaEnviar.filter(archivo => archivo !== blob)
+            archivosParaEnviarEdit = archivosParaEnviarEdit.filter(archivo => archivo !== blob)
         }
 
         card.appendChild(btnDelete)
@@ -453,6 +453,7 @@ document.getElementById('inputFileEdit').addEventListener('change', function(e) 
 // ==========================================
 // FUNCIÓN SUBIR (LLAMADA DESDE EL FORMULARIO)
 // ==========================================
+let archivosParaEnviar = [];
 function subir() {
     const title = document.getElementById('txttitulo').value.trim();
     const note = document.getElementById('txttext').value.trim();
