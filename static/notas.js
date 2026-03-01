@@ -36,6 +36,36 @@ function delPreview() {
 }
 
 
+async function descargarImagen() {
+    const img = document.getElementById('previewimg');
+    const src = img.src;
+
+    try {
+        // 1. Obtener la imagen como blob
+        const response = await fetch(src);
+        const blob = await response.blob();
+
+        // 2. Crear URL temporal
+        const url = URL.createObjectURL(blob);
+
+        // 3. Crear enlace invisible
+        const enlace = document.createElement('a');
+        enlace.href = url;
+        enlace.download = 'descarga.jpg';
+        
+        // 4. Simular clic
+        document.body.appendChild(enlace);
+        enlace.click();
+        document.body.removeChild(enlace);
+
+        // 5. Liberar memoria
+        URL.revokeObjectURL(url);
+    } catch (error) {
+        console.error('Error al descargar:', error);
+        alert('No se pudo descargar la imagen');
+    }
+}
+
 //Buscar
 
 document.addEventListener('DOMContentLoaded', () => {
