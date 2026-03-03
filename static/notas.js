@@ -19,7 +19,6 @@ const cargademensajes = document.getElementById('cargademensajes')
 
 const preview = document.getElementById('preview')
 const previewimg = document.getElementById('previewimg')
-var local = 1
 
 const fecha = new Date()
 const hoy = `${fecha.getUTCDate()}/${fecha.getUTCMonth()+1}/${fecha.getFullYear()}`

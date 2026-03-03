@@ -27,26 +27,26 @@
         <div style="font-size: 20px; font-family: 'Courier New', Courier, monospace; color: white; padding: 10px;" onclick="Alternar(addnote)">Nueva nota - X</div>
         <form style="position: relative; display: flex; flex-direction: column; width: 90%;" onsubmit="event.preventDefault();subir()">
             <div style="display: flex; margin: 5px; align-items: center; justify-content: center;">
-                <input style="border-radius: 20px; padding: 10px; width: 100%;" type="text" placeholder="Titulo" id="txttitulo" required autocomplete="off">  
+                <input style="font-size: 16px; border-radius: 20px; padding: 10px; width: 100%;" type="text" placeholder="Titulo" id="txttitulo" required autocomplete="off">  
                 <button type="button" onclick="document.getElementById('inputFile').click()" style="border-radius: 20px; padding: 5px; position: absolute; right: 10px; border-style: dashed;">📸</button>
             </div>
-            <textarea style="border-radius: 20px; padding: 10px; margin: 5px; height: 30vh; font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;" placeholder="Nota" id="txttext" required spellcheck="false"></textarea>
+            <textarea style="font-size: 16px; border-radius: 20px; padding: 10px; margin: 5px; height: 30vh; font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;" placeholder="Nota" id="txttext" required spellcheck="false"></textarea>
             <input id="inputFile" type="file" multiple accept="image/*" style="display: none;">
             <div id="galeria"></div>
-            <button style="border-radius: 20px; padding: 10px; margin: 5px; background: linear-gradient(135deg, rgba(0, 255, 4, 0.75), rgb(255, 255, 255), rgba(0, 255, 4, 0.75));" type="submit">Guardar</button>
+            <button style="border-radius: 20px; padding: 10px; margin: 5px; background: linear-gradient(135deg, rgba(0, 255, 4, 0.75), rgb(255, 255, 255), rgba(0, 255, 4, 0.75));" type="submit"><strong>Guardar</strong></button>
         </form>
     </div>
     <div id="editnote">
         <div style="font-size: 20px; font-family: 'Courier New', Courier, monospace; color: white; padding: 10px;" onclick="Alternar(editdiv)">Editar nota - X</div>
         <form style="position: relative; display: flex; flex-direction: column; width: 90%;" onsubmit="event.preventDefault();seditar()">
             <div style="display: flex; margin: 5px; align-items: center; justify-content: center;">
-                <input style="border-radius: 20px; padding: 10px; width: 100%;" type="text" placeholder="Titulo" id="edittitulo" required autocomplete="off">
+                <input style="font-size: 16px; border-radius: 20px; padding: 10px; width: 100%;" type="text" placeholder="Titulo" id="edittitulo" required autocomplete="off">
                 <button type="button" onclick="document.getElementById('editinputFile').click()" style="border-radius: 20px; padding: 5px; position: absolute; right: 10px; border-style: dashed;">📸</button>
             </div>
-            <textarea style="border-radius: 20px; padding: 10px; margin: 5px; height: 30vh; font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;" placeholder="Nota" id="edittext" required spellcheck="false"></textarea>
+            <textarea style="font-size: 16px; border-radius: 20px; padding: 10px; margin: 5px; height: 30vh; font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;" placeholder="Nota" id="edittext" required spellcheck="false"></textarea>
             <input id="editinputFile" type="file" multiple accept="image/*" style="display: none;">    
             <div id="editgaleria"></div>
-            <button style="border-radius: 20px; padding: 10px; margin: 5px; background: linear-gradient(135deg, rgba(0, 255, 4, 0.75), rgb(255, 255, 255), rgba(0, 2550.75));" type="submit">Guardar</button>
+            <button style="border-radius: 20px; padding: 10px; margin: 5px; background: linear-gradient(135deg, rgba(0, 255, 4, 0.75), rgb(255, 255, 255), rgba(0, 255, 4, 0.75));" type="submit"><strong>Guardar</strong></button>
         </form>
     </div>
     <div class="note-container" id="note-container">
