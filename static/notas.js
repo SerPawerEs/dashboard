@@ -14,9 +14,12 @@ const addnote = document.getElementById('addnote')
 const editdiv = document.getElementById('editnote')
 const wtitulo = document.getElementById('edittitulo')
 const wtexto = document.getElementById('edittext')
+const loading = document.getElementById('loading')
+const cargademensajes = document.getElementById('cargademensajes')
 
 const preview = document.getElementById('preview')
 const previewimg = document.getElementById('previewimg')
+var local = 1
 
 const fecha = new Date()
 const hoy = `${fecha.getUTCDate()}/${fecha.getUTCMonth()+1}/${fecha.getFullYear()}`
@@ -27,9 +30,86 @@ document.addEventListener('DOMContentLoaded', () => {
     }else{
         window.location.href = 'inicio.html'
     }
+    if (cargademensajes) {
+        loading.style.display = 'flex'
+    }
 })
-//Functions
 
+
+//Database ----------------------------------------------
+
+const dbURL = 'https://database-3c232-default-rtdb.firebaseio.com/'
+firebase.initializeApp({databaseURL:dbURL})
+const db = firebase.database()
+
+
+db.ref('notas').on('value', (data) => {
+    list.innerHTML = ""
+    const datos = data.val()
+    if(datos){
+        Object.entries(datos).toReversed().forEach(([key, val]) => {
+            const cont = document.createElement('details')
+            const txttit = document.createElement('summary')
+            txttit.style = 'text-decoration: underline;'
+            const txtmd = document.createElement('p')
+            const strong = document.createElement('strong')
+            cont.className = 'content-note'
+
+            const delbtn = document.createElement('button')
+            delbtn.textContent = 'Eliminar'
+            delbtn.style = 'border-radius: 20px; padding: 5px; margin: 5px; background: linear-gradient(135deg, rgb(255, 0, 0), rgb(255, 255, 255), rgb(255, 0, 0));'
+            delbtn.onclick = function() {
+                if(confirm('Vas a eliminar este elemento para siempre, ¿Continuar?')){
+                    db.ref('/notas/' + key).remove()
+                    console.log('btn', key, 'presonado')
+                }
+            }
+
+            const editbtn = document.createElement('button')
+            editbtn.textContent = 'Editar'
+            editbtn.style = 'border-radius: 20px; padding: 5px; margin: 5px; background: linear-gradient(135deg, rgb(38, 0, 255), rgb(255, 255, 255), rgb(38, 0, 255));'
+            editbtn.onclick = function() {
+                // Agrega val.imagenes como cuarto parámetro
+                editar(key, val.title, val.note, val.imagenes || [])
+            }
+            strong.textContent = `${val.title}`
+            txtmd.textContent = `${val.note}`
+
+            list.appendChild(cont)
+            cont.appendChild(txttit)
+            cont.appendChild(txtmd)
+            
+            // ==========================================
+            // NUEVO: MOSTRAR IMÁGENES (DEBAJO DEL TEXTO)
+            // ==========================================
+            if(val.imagenes && val.imagenes.length > 0) {
+                const imgContainer = document.createElement('div')
+                imgContainer.style = 'display: flex; flex-wrap: wrap; gap: 10px; margin: 10px 0;'
+                
+                val.imagenes.forEach(imgSrc => {
+                    const img = document.createElement('img')
+                    img.src = imgSrc
+                    img.style = 'max-width: 200px; max-height: 200px; border-radius: 10px; border: 1px solid #ddd; cursor: pointer; transition: transform 0.2s;'
+                    img.onclick = function() {
+                        preview.style.display = 'flex'
+                        previewimg.src = imgSrc
+                    }
+                    imgContainer.appendChild(img)
+                })
+                
+                cont.appendChild(imgContainer)
+            }
+            // ==========================================
+            
+            cont.appendChild(delbtn)
+            cont.appendChild(editbtn)
+            txttit.appendChild(strong)
+        })
+        loading.style.display = 'none'
+    }
+})
+
+//Functions
 function delPreview() {
     previewimg.scr = ''
     preview.style.display = 'none'
@@ -174,78 +254,6 @@ salir.addEventListener('click', () => {
     window.location.href = 'inicio.html'
 })
 
-//Database ----------------------------------------------
-
-const dbURL = 'https://database-3c232-default-rtdb.firebaseio.com/'
-firebase.initializeApp({databaseURL:dbURL})
-const db = firebase.database()
-
-
-db.ref('notas').on('value', (data) => {
-    list.innerHTML = ""
-    const datos = data.val()
-    if(datos){
-        Object.entries(datos).toReversed().forEach(([key, val]) => {
-            const cont = document.createElement('details')
-            const txttit = document.createElement('summary')
-            txttit.style = 'text-decoration: underline;'
-            const txtmd = document.createElement('p')
-            const strong = document.createElement('strong')
-            cont.className = 'content-note'
-
-            const delbtn = document.createElement('button')
-            delbtn.textContent = 'Eliminar'
-            delbtn.style = 'border-radius: 20px; padding: 5px; margin: 5px; background: linear-gradient(135deg, rgb(255, 0, 0), rgb(255, 255, 255), rgb(255, 0, 0));'
-            delbtn.onclick = function() {
-                if(confirm('Vas a eliminar este elemento para siempre, ¿Continuar?')){
-                    db.ref('/notas/' + key).remove()
-                    console.log('btn', key, 'presonado')
-                }
-            }
-
-            const editbtn = document.createElement('button')
-            editbtn.textContent = 'Editar'
-            editbtn.style = 'border-radius: 20px; padding: 5px; margin: 5px; background: linear-gradient(135deg, rgb(38, 0, 255), rgb(255, 255, 255), rgb(38, 0, 255));'
-            editbtn.onclick = function() {
-                // Agrega val.imagenes como cuarto parámetro
-                editar(key, val.title, val.note, val.imagenes || [])
-            }
-            strong.textContent = `${val.title}`
-            txtmd.textContent = `${val.note}`
-
-            list.appendChild(cont)
-            cont.appendChild(txttit)
-            cont.appendChild(txtmd)
-            
-            // ==========================================
-            // NUEVO: MOSTRAR IMÁGENES (DEBAJO DEL TEXTO)
-            // ==========================================
-            if(val.imagenes && val.imagenes.length > 0) {
-                const imgContainer = document.createElement('div')
-                imgContainer.style = 'display: flex; flex-wrap: wrap; gap: 10px; margin: 10px 0;'
-                
-                val.imagenes.forEach(imgSrc => {
-                    const img = document.createElement('img')
-                    img.src = imgSrc
-                    img.style = 'max-width: 200px; max-height: 200px; border-radius: 10px; border: 1px solid #ddd; cursor: pointer; transition: transform 0.2s;'
-                    img.onclick = function() {
-                        preview.style.display = 'flex'
-                        previewimg.src = imgSrc
-                    }
-                    imgContainer.appendChild(img)
-                })
-                
-                cont.appendChild(imgContainer)
-            }
-            // ==========================================
-            
-            cont.appendChild(delbtn)
-            cont.appendChild(editbtn)
-            txttit.appendChild(strong)
-        })
-    }
-})
-
 // EDITAR -----------------------------------------
 
 
@@ -358,7 +366,7 @@ function mostrarVistaPreviaEditar(blob) {
 // FUNCIÓN SEDITAR (GUARDA CAMBIOS)
 // ==========================================
 function seditar() {
-    document.getElementById('loading').style.display = 'flex'
+    loading.style.display = 'flex'
     const key = editdiv.className
     const title = document.getElementById('edittitulo').value.trim()
     const note = document.getElementById('edittext').value.trim()
@@ -430,7 +438,7 @@ function actualizarNotaFirebase(key, title, note, imagenes) {
         document.getElementById('editgaleria').innerHTML = ''
         
         Alternar(editdiv)
-        document.getElementById('loading').style.display = 'none'
+        loading.style.display = 'none'
     })
     .catch((error) => {
         console.error('Error al actualizar nota:', error)
@@ -476,7 +484,7 @@ document.getElementById('editinputFile').addEventListener('change', function(e) 
 // ==========================================
 let archivosParaEnviar = [];
 function subir() {
-    document.getElementById('loading').style.display = 'flex'
+    loading.style.display = 'flex'
     const title = document.getElementById('txttitulo').value.trim();
     const note = document.getElementById('txttext').value.trim();
 
@@ -544,7 +552,7 @@ function guardarNotaEnFirebase(title, note, imagenesBase64) {
         
         // Tu función original
         Alternar(addnote);
-        document.getElementById('loading').style.display = 'none'
+        loading.style.display = 'none'
     })
     .catch((error) => {
         console.error('Error al guardar nota:', error);
