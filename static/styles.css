@@ -276,7 +276,7 @@ body{
     user-select: text;
     font-size: 18px;
 
-    background: linear-gradient(135deg, rgb(122, 217, 255), rgb(184, 184, 255), rgb(0, 183, 255));
+    background: linear-gradient(135deg, rgb(122, 217, 255), rgb(192, 192, 255), rgb(122, 217, 255));
     background-size: 200%;
     background-position: 0%;
     transition: all 0.4s ease;
