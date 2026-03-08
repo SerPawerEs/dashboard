@@ -114,8 +114,8 @@ body{
     display: none;
     align-items: center;
     justify-content: center;
-    top: 9px;
-    left: 10px;
+    top: 8px;
+    left: 60px;
     right: 160px;
     border-radius: 30px;
     outline: solid;
@@ -194,6 +194,47 @@ body{
 
 #notas:hover{
     background-color: rgb(0, 145, 255, 0.75);
+}
+
+#config{
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    top: 10px;
+    left: 10px;
+    padding: 10px;
+    border-radius: 20px;
+    outline: solid;
+    background-color: rgba(0, 64, 255, 0.75);
+    transition: all 0.5s ease;
+    user-select: none;
+    z-index: 1;
+}
+
+#config:hover{
+    background-color: rgb(0, 145, 255, 0.75);
+}
+
+#config-container{
+    display: none;
+    flex-direction: column;
+    position: absolute;
+    width: 90%;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    padding: 5px;
+    margin: 5px;
+    border-radius: 15px;
+    outline-style: solid;
+    z-index: 1;
+
+    background: linear-gradient(135deg, rgb(0, 183, 255), blue, rgb(0, 183, 255));
+    background-size: 200%;
+    background-position: 0%;
+    transition: all 0.4s ease;
+    max-width: 600px;
 }
 
 #buscador{
@@ -488,6 +529,9 @@ body{
         background-color: rgba(0, 64, 255, 0.75);
     }
     #notas:hover{
+        background-color: rgba(0, 64, 255, 0.75);
+    }
+    #config:hover{
         background-color: rgba(0, 64, 255, 0.75);
     }
     .title:hover{
