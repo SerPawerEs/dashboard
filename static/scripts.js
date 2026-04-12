@@ -12,7 +12,7 @@ const pwsa = '25565'
 const fecha = new Date()
 const hoy = `${fecha.getUTCDate()}/${fecha.getUTCMonth()+1}/${fecha.getFullYear()}`
 
-const version = '1.0.2'
+const version = '1.0.3'
 
 
 console.log('version: ', version)
