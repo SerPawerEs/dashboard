@@ -117,7 +117,7 @@ body{
     left: 60px;
     right: 160px;
     border-radius: 30px;
-    outline: solid;
+    outline-style: solid;
     background-color: rgba(0, 64, 255, 0.5);
     z-index: 1;
 }
@@ -144,7 +144,7 @@ body{
     right: 110px;
     padding: 10px;
     border-radius: 20px;
-    outline: solid;
+    outline-style: solid;
     background-color: rgba(0, 64, 255, 0.75);
     transition: all 0.5s ease;
     user-select: none;
@@ -164,7 +164,7 @@ body{
     right: 10px;
     padding: 10px;
     border-radius: 20px;
-    outline: solid;
+    outline-style: solid;
     background-color: rgba(0, 64, 255, 0.75);
     transition: all 0.5s ease;
     user-select: none;
@@ -184,7 +184,7 @@ body{
     right: 60px;
     padding: 10px;
     border-radius: 20px;
-    outline: solid;
+    outline-style: solid;
     background-color: rgba(0, 64, 255, 0.75);
     transition: all 0.5s ease;
     user-select: none;
@@ -204,7 +204,7 @@ body{
     left: 10px;
     padding: 10px;
     border-radius: 20px;
-    outline: solid;
+    outline-style: solid;
     background-color: rgba(0, 64, 255, 0.75);
     transition: all 0.5s ease;
     user-select: none;
