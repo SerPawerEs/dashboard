@@ -12,8 +12,8 @@ const pwsa = '25565'
 const fecha = new Date()
 const hoy = `${fecha.getUTCDate()}/${fecha.getUTCMonth()+1}/${fecha.getFullYear()}`
 
-const version = '1.0.3'
-
+const version = '1.0.4'
+const versionin = document.getElementById('version')
 
 console.log('version: ', version)
 document.addEventListener('DOMContentLoaded', () => {
@@ -21,10 +21,10 @@ document.addEventListener('DOMContentLoaded', () => {
         container.style.display = 'flex'
         joinform.style.display = 'none'
     }
-
     enlaces.forEach(enlace => {
         enlace.target = '_blank'
     })
+    versionin.innerHTML = version
 })
 
 function acces(event) {
