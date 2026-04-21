@@ -77,6 +77,7 @@ body{
 .note-container{
     display: flex;
     flex-direction: column;
+    gap: 0.5em;
     width: 100%;
     height: 100%;
     padding-top: 55px;
@@ -87,6 +88,32 @@ body{
     justify-content: start;
     align-items: center;
 }
+
+.content-note{
+    flex-direction: column;
+    position: relative;
+    width: 80%;
+    padding: 5px;
+    border-radius: 5px;
+    outline-style: solid;
+    text-decoration: none;
+
+    color: black;
+    user-select: text;
+    font-size: 18px;
+
+    background: linear-gradient(135deg, rgb(122, 217, 255), rgb(192, 192, 255), rgb(122, 217, 255));
+    background-size: 200%;
+    background-position: 0%;
+    transition: all 0.4s ease;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
+}
+
+.content-note:hover{
+    background-position: 100%;
+}
+
 
 #galeria {
     display: flex;
@@ -300,34 +327,6 @@ a{
     content: '🔗';
 }
 
-
-.content-note{
-    display: flex;
-    flex-direction: column;
-    position: relative;
-    width: 80%;
-    padding: 5px;
-    margin: 5px;
-    border-radius: 5px;
-    outline-style: solid;
-    text-decoration: none;
-    font-size: 15px;
-    color: black;
-    user-select: text;
-    font-size: 18px;
-
-    background: linear-gradient(135deg, rgb(122, 217, 255), rgb(192, 192, 255), rgb(122, 217, 255));
-    background-size: 200%;
-    background-position: 0%;
-    transition: all 0.4s ease;
-    overflow-wrap: break-word;
-    white-space: pre-wrap;
-}
-
-.content-note:hover{
-    background-position: 100%;
-}
-
 #addnote{
     display: none;
     flex-direction: column;
@@ -535,6 +534,21 @@ a{
 }
 
 @media (max-width: 768px) {
+    .note-container{
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        height: 100%;
+        padding-top: 55px;
+        padding-bottom: 40px;
+        margin: 0px;
+        overflow-x: hidden;
+        overflow-y: scroll;
+        justify-content: start;
+        align-items: center;
+    }
+
+
     #lupa:hover{
         background-color: rgba(0, 64, 255, 0.75);
     }
