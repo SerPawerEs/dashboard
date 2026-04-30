@@ -170,7 +170,7 @@ function buscarTexto() {
     if (!input) return;
 
     const filter = input.value.trim().toLowerCase();
-    const container = document.getElementById('note-container');
+    const container = list
     if (!container) return;
 
     const detailsList = container.querySelectorAll('details.content-note');
