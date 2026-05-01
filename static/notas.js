@@ -214,6 +214,7 @@ lupa.addEventListener('click', () => {
     }else{
         searchbar.style.animation = 'intro1 0.3s ease'
         searchbar.style.display = 'flex'
+        document.getElementById('buscador').focus()
         setTimeout(() => {
             searchbar.style.animation = 'none'
         }, 200);

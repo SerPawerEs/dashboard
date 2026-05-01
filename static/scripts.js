@@ -1,5 +1,5 @@
 const buscador = document.getElementById('buscador')
-const enlaces = document.querySelectorAll('.content')
+const enlaces = document.querySelectorAll('a')
 const lupa = document.getElementById('lupa')
 const searchbar = document.getElementById('search-bar')
 const borrar = document.getElementById('borrar')
@@ -14,23 +14,30 @@ const hoy = `${fecha.getUTCDate()}/${fecha.getUTCMonth()+1}/${fecha.getFullYear(
 
 
 document.addEventListener('DOMContentLoaded', () => {
-    if (localStorage.getItem('sesion') == hoy){
-        container.style.display = 'flex'
-        joinform.style.display = 'none'
-    }
+    verify()
     enlaces.forEach(enlace => {
         enlace.target = '_blank'
     })
 })
 
+function verify(){
+    if (localStorage.getItem('sesion') == hoy){
+        document.querySelector('header').style.display = 'flex'
+        container.style.display = 'flex'
+        joinform.style.display = 'none'
+    }else{
+        document.querySelector('header').style.display = 'none'
+    }
+}
+
+
 function acces(event) {
     event.preventDefault()
     const contenido = contraseña.value.toLowerCase().trim()
     if (contenido == pwsa){
-        container.style.display = 'flex'
-        joinform.style.display = 'none'
         localStorage.setItem('sesion', hoy)
         sendNoti('✔️ Acceso')
+        verify()
     }else{
         sendNoti('✖️ Contraseña Incorrecta')
         contraseña.value = ''
@@ -84,6 +91,7 @@ lupa.addEventListener('click', () => {
     }else{
         searchbar.style.animation = 'intro1 0.3s ease'
         searchbar.style.display = 'flex'
+        document.getElementById('buscador').focus()
         setTimeout(() => {
             searchbar.style.animation = 'none'
         }, 200);
