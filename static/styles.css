@@ -46,16 +46,10 @@ body::before {
     z-index: 0;
 }
 
-/* ── Versión ── */
-#version {
-    position: absolute;
-    right: 12px;
-    bottom: 12px;
-    z-index: 1;
-    opacity: 0.35;
-    font-size: 12px;
-    color: var(--text);
-    user-select: none;
+/* ── span ── */
+
+span{
+    font-size: 0.8rem;
 }
 
 /* ── Contenedor principal ── */
