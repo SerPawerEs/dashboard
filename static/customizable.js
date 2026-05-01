@@ -1,7 +1,7 @@
 const configbtn = document.getElementById('configbtn')
 const configdisplay = document.getElementById('configdisplay')
 
-const version = '1.2.1'
+const version = '1.2.2'
 const versionin = document.getElementById('version')
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -16,3 +16,13 @@ configbtn.addEventListener('click', () => {
         configdisplay.style.display = 'flex'
     }
 })
+
+function sendNoti(msg){
+    const noti = document.createElement('span')
+    noti.textContent = msg
+    noti.className = 'notification'
+    document.body.appendChild(noti)
+    setTimeout(() => {
+        noti.remove()
+    }, 2000);
+}

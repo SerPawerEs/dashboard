@@ -30,9 +30,10 @@ function acces(event) {
         container.style.display = 'flex'
         joinform.style.display = 'none'
         localStorage.setItem('sesion', hoy)
+        sendNoti('✔️ Acceso')
     }else{
-        alert('Contraseña incorrecta')
-        window.location.href = window.location.href
+        sendNoti('✖️ Contraseña Incorrecta')
+        contraseña.value = ''
     }
 }
 

@@ -56,7 +56,7 @@ db.ref('notas').on('value', (data) => {
 
             const delbtn = document.createElement('button')
             delbtn.textContent = 'Eliminar'
-            delbtn.style = 'border-radius: 20px; padding: 5px; margin: 5px; background: linear-gradient(135deg, rgb(255, 0, 0), rgb(255, 255, 255), rgb(255, 0, 0));'
+            delbtn.className = 'btn-tarjeta-eliminar'
             delbtn.onclick = function() {
                 if(confirm('Vas a eliminar este elemento para siempre, ¿Continuar?')){
                     db.ref('/notas/' + key).remove()
@@ -66,7 +66,7 @@ db.ref('notas').on('value', (data) => {
 
             const editbtn = document.createElement('button')
             editbtn.textContent = 'Editar'
-            editbtn.style = 'border-radius: 20px; padding: 5px; margin: 5px; background: linear-gradient(135deg, rgb(38, 0, 255), rgb(255, 255, 255), rgb(38, 0, 255));'
+            editbtn.className = 'btn-tarjeta-editar'
             editbtn.onclick = function() {
                 // Agrega val.imagenes como cuarto parámetro
                 editar(key, val.title, val.note, val.imagenes || [])
@@ -105,6 +105,7 @@ db.ref('notas').on('value', (data) => {
             txttit.appendChild(strong)
         })
         loading.style.display = 'none'
+        sendNoti('📁 Carga finalizada')
     }
 })
 
