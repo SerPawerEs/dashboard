@@ -33,7 +33,6 @@ body {
     align-items: center;
     user-select: none;
     font-family: -apple-system, 'SF Pro Display', 'Helvetica Neue', sans-serif;
-    overflow: hidden;
 }
 
 /* Capa de ruido/textura sutil sobre el fondo */
