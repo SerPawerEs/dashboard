@@ -6,11 +6,6 @@
     <title>Dashboard - Notas</title>
     <link rel="stylesheet" href="static/styles.css">
     <link rel="icon" href="resources/docu.png" type="image/png">
-    <style>
-        textarea{
-            resize: vertical;
-        }
-    </style>
 </head>
 <body>
     <div id="search-bar">
@@ -20,42 +15,48 @@
     <div id="lupa">🔍</div>
     <div id="notas">➕</div>
     <div id="salir">🔙</div>
+    <div id="configbtn">⚙️</div>
+    <div id="configdisplay">
+        <h2>Ajustes</h2>
+        <span>aun no hay nada aquí</span>
+    </div>
+
     <div id="preview">
-        <button style="border-radius: 50px; background-color: red; position: absolute; top: 5px; right: 5px; border-style: solid; font-size: 20px; width: 50px; height: 50px; z-index: 1;" onclick="delPreview()"><strong>X</strong></button>
-        <button style="border-radius: 50px; background-color: rgb(0, 55, 255); position: absolute; top: 5px; right: 60px; border-style: solid; font-size: 20px; width: 50px; height: 50px; z-index: 1;" onclick="descargarImagen()">🗂️</button>
-        <img style="max-width: 100%; max-height: 100vh; align-items: center; justify-content: center; text-align: center;" id="previewimg">
+        <button class="btn-preview-delete" onclick="delPreview()"><strong>X</strong></button>
+        <button class="btn-preview-download" onclick="descargarImagen()">🗂️</button>
+        <img class="preview-img" id="previewimg">
     </div>
     <div id="loading">
-        <div style="font-size: 30px; background-color: rgba(255, 255, 255, 0.75); padding: 5px; border-radius: 5px; animation: loading 2s ease-in-out infinite;">Cargando 📂</div>
+        <div class="loading-text">Cargando 📂</div>
     </div>
     <div id="addnote">
-        <div style="font-size: 20px; font-family: 'Courier New', Courier, monospace; color: white; padding: 10px;" onclick="Alternar(addnote)">Nueva nota - X</div>
-        <form style="position: relative; display: flex; flex-direction: column; width: 90%;" onsubmit="event.preventDefault();subir()">
-            <div style="display: flex; margin: 5px; align-items: center; justify-content: center;">
-                <input style="font-size: 16px; border-radius: 20px; padding: 10px; width: 100%;" type="text" placeholder="Titulo" id="txttitulo" required autocomplete="off">  
-                <button type="button" onclick="document.getElementById('inputFile').click()" style="border-radius: 20px; padding: 5px; position: absolute; right: 10px; border-style: dashed;">📸</button>
+        <div class="modal-header" onclick="Alternar(addnote)">Nueva nota - X</div>
+        <form class="modal-form" onsubmit="event.preventDefault();subir()">
+            <div class="input-row">
+                <input class="input-title" type="text" placeholder="Titulo" id="txttitulo" required autocomplete="off">  
+                <button type="button" class="btn-camera" onclick="document.getElementById('inputFile').click()">📸</button>
             </div>
-            <textarea style="font-size: 16px; border-radius: 20px; padding: 10px; margin: 5px; height: 30vh; font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;" placeholder="Nota" id="txttext" required spellcheck="false"></textarea>
+            <textarea class="textarea-note textarea-resizable" placeholder="Nota" id="txttext" required spellcheck="false"></textarea>
             <input id="inputFile" type="file" multiple accept="image/*" style="display: none;">
             <div id="galeria"></div>
-            <button style="border-radius: 20px; padding: 10px; margin: 5px; background: linear-gradient(135deg, rgba(0, 255, 4, 0.75), rgb(255, 255, 255), rgba(0, 255, 4, 0.75));" type="submit"><strong>Guardar</strong></button>
+            <button class="btn-save" type="submit"><strong>Guardar</strong></button>
         </form>
     </div>
     <div id="editnote">
-        <div style="font-size: 20px; font-family: 'Courier New', Courier, monospace; color: white; padding: 10px;" onclick="Alternar(editdiv)">Editar nota - X</div>
-        <form style="position: relative; display: flex; flex-direction: column; width: 90%;" onsubmit="event.preventDefault();seditar()">
-            <div style="display: flex; margin: 5px; align-items: center; justify-content: center;">
-                <input style="font-size: 16px; border-radius: 20px; padding: 10px; width: 100%;" type="text" placeholder="Titulo" id="edittitulo" required autocomplete="off">
-                <button type="button" onclick="document.getElementById('editinputFile').click()" style="border-radius: 20px; padding: 5px; position: absolute; right: 10px; border-style: dashed;">📸</button>
+        <div class="modal-header" onclick="Alternar(editdiv)">Editar nota - X</div>
+        <form class="modal-form" onsubmit="event.preventDefault();seditar()">
+            <div class="input-row">
+                <input class="input-title" type="text" placeholder="Titulo" id="edittitulo" required autocomplete="off">
+                <button type="button" class="btn-camera" onclick="document.getElementById('editinputFile').click()">📸</button>
             </div>
-            <textarea style="font-size: 16px; border-radius: 20px; padding: 10px; margin: 5px; height: 30vh; font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;" placeholder="Nota" id="edittext" required spellcheck="false"></textarea>
+            <textarea class="textarea-note textarea-resizable" placeholder="Nota" id="edittext" required spellcheck="false"></textarea>
             <input id="editinputFile" type="file" multiple accept="image/*" style="display: none;">    
             <div id="editgaleria"></div>
-            <button style="border-radius: 20px; padding: 10px; margin: 5px; background: linear-gradient(135deg, rgba(0, 255, 4, 0.75), rgb(255, 255, 255), rgba(0, 255, 4, 0.75));" type="submit"><strong>Guardar</strong></button>
+            <button class="btn-save" type="submit"><strong>Guardar</strong></button>
         </form>
     </div>
     <div class="note-container" id="note-container">
-        <div class="content-note" id="cargademensajes"><strong style="text-align: center;">Cargando Elementos... 💾</strong></div>
+        <div class="content-note" id="cargademensajes"><strong class="text-center">Cargando Elementos... 💾</strong></div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
