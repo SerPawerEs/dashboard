@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GlassBoard - Whiteboard Virtual</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; overflow: hidden; height: 100vh; width: 100vw; background: #0a0a1a; color: #ffffff; user-select: none; -webkit-user-select: none; touch-action: none; }
+        .bg-animation { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; overflow: hidden; }
+        .bg-animation .orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.5; animation: floatOrb 20s infinite ease-in-out; }
+        .orb:nth-child(1) { width: 500px; height: 500px; background: radial-gradient(circle, #6366f1, #8b5cf6); top: -10%; left: -5%; animation-duration: 25s; }
+        .orb:nth-child(2) { width: 400px; height: 400px; background: radial-gradient(circle, #ec4899, #f43f5e); top: 50%; right: -5%; animation-duration: 20s; animation-delay: -5s; }
+        .orb:nth-child(3) { width: 350px; height: 350px; background: radial-gradient(circle, #06b6d4, #3b82f6); bottom: -10%; left: 30%; animation-duration: 22s; animation-delay: -10s; }
+        .orb:nth-child(4) { width: 300px; height: 300px; background: radial-gradient(circle, #10b981, #14b8a6); top: 20%; left: 50%; animation-duration: 18s; animation-delay: -3s; }
+        @keyframes floatOrb { 0%, 100% { transform: translate(0, 0) scale(1); } 25% { transform: translate(100px, -80px) scale(1.1); } 50% { transform: translate(-60px, 100px) scale(0.9); } 75% { transform: translate(80px, 60px) scale(1.05); } }
+
+        .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 16px; }
+        .glass-strong { background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); border: 1px solid rgba(255, 255, 255, 0.18); border-radius: 16px; }
+
+        .toolbar-top { position: fixed; top: 12px; left: 50%; transform: translateX(-50%); z-index: 100; display: flex; align-items: center; gap: 4px; padding: 8px 12px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255,255,255,0.1); }
+        .tool-btn { width: 44px; height: 44px; border: none; background: transparent; color: #ffffff; border-radius: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; position: relative; }
+        .tool-btn:hover { background: rgba(255, 255, 255, 0.12); transform: translateY(-1px); }
+        .tool-btn.active { background: rgba(99, 102, 241, 0.4); border: 1px solid rgba(99, 102, 241, 0.6); box-shadow: 0 0 15px rgba(99, 102, 241, 0.3); }
+        .tool-btn svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+        .tool-separator { width: 1px; height: 30px; background: rgba(255, 255, 255, 0.15); margin: 0 6px; }
+        .color-picker-wrapper { position: relative; display: flex; align-items: center; }
+        .color-preview { width: 32px; height: 32px; border-radius: 10px; border: 2px solid rgba(255, 255, 255, 0.3); cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+        .color-preview:hover { transform: scale(1.1); border-color: rgba(255,255,255,0.6); }
+        #colorPicker { position: absolute; opacity: 0; width: 32px; height: 32px; cursor: pointer; }
+        .preset-colors { display: flex; gap: 4px; margin-left: 8px; }
+        .preset-color { width: 22px; height: 22px; border-radius: 6px; border: 2px solid transparent; cursor: pointer; transition: all 0.2s; }
+        .preset-color:hover { transform: scale(1.2); }
+        .preset-color.active { border-color: #fff; box-shadow: 0 0 8px rgba(255,255,255,0.5); }
+        .size-control { display: flex; align-items: center; gap: 8px; margin-left: 8px; padding: 0 8px; }
+        .size-control label { font-size: 11px; font-weight: 500; opacity: 0.7; white-space: nowrap; }
+        .size-slider { -webkit-appearance: none; appearance: none; width: 80px; height: 6px; border-radius: 3px; background: rgba(255,255,255,0.15); outline: none; cursor: pointer; }
+        .size-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 18px; height: 18px; border-radius: 50%; background: #ffffff; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+        .size-slider::-moz-range-thumb { width: 18px; height: 18px; border-radius: 50%; background: #ffffff; cursor: pointer; border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+
+        .canvas-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .drawing-area { position: relative; width: 1600px; height: 900px; flex: 0 0 auto; border-radius: 18px; background: rgba(255, 255, 255, 0.015); border: 2px solid rgba(255, 255, 255, 0.12); box-shadow: 0 0 40px rgba(99, 102, 241, 0.08), inset 0 0 30px rgba(255, 255, 255, 0.02); overflow: hidden; transform-origin: center center; touch-action: none; }
+        .drawing-area::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-image: linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px); background-size: 40px 40px; pointer-events: none; z-index: 0; border-radius: 16px; }
+        #whiteboard { cursor: crosshair; display: block; position: absolute; top: 0; left: 0; z-index: 1; width: 1600px; height: 900px; touch-action: none; }
+        #previewCanvas { position: absolute; top: 0; left: 0; z-index: 2; width: 1600px; height: 900px; pointer-events: none; }
+
+        .panel-left { position: fixed; top: 80px; left: 12px; z-index: 100; display: flex; flex-direction: column; gap: 4px; padding: 8px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255,255,255,0.1); }
+        .panel-right { position: fixed; top: 80px; right: 12px; z-index: 100; display: flex; flex-direction: column; gap: 4px; padding: 8px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255,255,255,0.1); }
+        .action-btn { width: 40px; height: 40px; border: none; background: transparent; color: #ffffffcc; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; position: relative; }
+        .action-btn:hover { background: rgba(255,255,255,0.1); color: #ffffff; transform: translateY(-1px); }
+        .action-btn svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+        .tool-btn[data-tooltip]:hover::after, .action-btn[data-tooltip]:hover::after { content: attr(data-tooltip); position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%); padding: 5px 10px; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); color: #fff; font-size: 11px; border-radius: 6px; white-space: nowrap; pointer-events: none; z-index: 1000; }
+
+        .text-input-overlay { position: fixed; z-index: 9999; display: none; pointer-events: auto; }
+        .text-input-overlay textarea { background: rgba(15, 15, 35, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 2px solid rgba(99, 102, 241, 0.6); border-radius: 12px; color: #fff; font-family: 'Inter', sans-serif; padding: 10px 14px; outline: none; resize: both; min-width: 150px; min-height: 36px; box-shadow: 0 6px 24px rgba(0,0,0,0.5); user-select: text !important; -webkit-user-select: text !important; pointer-events: auto !important; line-height: 1.4; }
+
+        .brush-preview { position: fixed; width: 10px; height: 10px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.8); pointer-events: none; z-index: 9998; transform: translate(-50%, -50%); display: none; box-shadow: 0 0 8px rgba(0,0,0,0.5); }
+
+        .tableros-bar { position: fixed; bottom: 12px; left: 50%; transform: translateX(-50%); z-index: 100; display: flex; align-items: center; gap: 4px; padding: 6px 8px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255,255,255,0.1); max-width: 95vw; overflow-x: auto; }
+        .tableros-bar::-webkit-scrollbar { height: 4px; } .tableros-bar::-webkit-scrollbar-track { background: transparent; } .tableros-bar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 2px; }
+        .tab-section { display: flex; align-items: center; gap: 2px; }
+        .tab-label { font-size: 10px; color: #ffffff66; margin: 0 4px; white-space: nowrap; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+        .tab-btn { min-width: 100px; max-width: 150px; height: 40px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: #ffffffaa; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 0 10px; font-size: 12px; font-weight: 500; font-family: 'Inter', sans-serif; transition: all 0.2s; white-space: nowrap; position: relative; }
+        .tab-btn:hover { background: rgba(255,255,255,0.1); color: #ffffff; }
+        .tab-btn.active { background: rgba(99, 102, 241, 0.3); border-color: rgba(99, 102, 241, 0.5); color: #ffffff; box-shadow: 0 0 15px rgba(99, 102, 241, 0.2); }
+        .tab-btn.cloud-synced { border-color: rgba(16, 185, 129, 0.4); }
+        .tab-btn.cloud-synced .tab-cloud-icon { color: #10b981; font-size: 12px; margin-left: 4px; }
+        .tab-btn .tab-name { pointer-events: none; overflow: hidden; text-overflow: ellipsis; }
+        .tab-name-input { background: transparent; border: 1px solid rgba(99,102,241,0.6); color: #fff; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 500; padding: 2px 6px; border-radius: 6px; outline: none; width: 100%; max-width: 120px; }
+        .tab-close { width: 18px; height: 18px; border-radius: 5px; border: none; background: rgba(255,255,255,0.1); color: #ffffff88; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; transition: all 0.2s; flex-shrink: 0; margin-left: 4px; }
+        .tab-close:hover { background: rgba(239, 68, 68, 0.4); color: #fff; }
+        .tab-add { width: 40px; height: 40px; border: 1px dashed rgba(255,255,255,0.2); background: transparent; color: #ffffff66; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 20px; transition: all 0.2s; flex-shrink: 0; }
+        .tab-add:hover { background: rgba(255,255,255,0.08); color: #ffffff; border-color: rgba(255,255,255,0.3); }
+        .zoom-indicator { position: fixed; bottom: 70px; right: 16px; z-index: 100; padding: 4px 10px; font-size: 12px; color: #ffffff88; background: rgba(0,0,0,0.3); backdrop-filter: blur(10px); border-radius: 8px; }
+
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); z-index: 5000; display: none; align-items: center; justify-content: center; cursor: pointer; }
+        .modal-overlay.show { display: flex; }
+        .modal-content { padding: 32px; max-width: 420px; width: 90%; text-align: center; cursor: default; }
+        .modal-content h3 { margin-bottom: 12px; font-weight: 600; font-size: 18px; }
+        .modal-content p { font-size: 14px; opacity: 0.75; margin-bottom: 24px; line-height: 1.5; }
+        .modal-buttons { display: flex; gap: 10px; justify-content: center; }
+        .modal-btn { padding: 10px 24px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.08); color: #fff; border-radius: 10px; cursor: pointer; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 500; transition: all 0.2s; }
+        .modal-btn:hover { background: rgba(255,255,255,0.15); }
+        .modal-btn.danger { background: rgba(239, 68, 68, 0.35); border-color: rgba(239, 68, 68, 0.5); }
+        .modal-btn.danger:hover { background: rgba(239, 68, 68, 0.55); }
+        .modal-btn.primary { background: rgba(99, 102, 241, 0.35); border-color: rgba(99, 102, 241, 0.5); }
+        .modal-btn.primary:hover { background: rgba(99, 102, 241, 0.55); }
+
+        .notification { position: fixed; top: 80px; left: 50%; transform: translateX(-50%) translateY(-20px); padding: 10px 20px; background: rgba(16, 185, 129, 0.3); backdrop-filter: blur(20px); border: 1px solid rgba(16, 185, 129, 0.5); color: #fff; border-radius: 12px; font-size: 13px; z-index: 6000; opacity: 0; transition: all 0.3s ease; pointer-events: none; }
+        .notification.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+        .notification.error { background: rgba(239, 68, 68, 0.3); border-color: rgba(239, 68, 68, 0.5); }
+        #fileInput { display: none; }
+
+        @media (max-width: 850px) {
+            .toolbar-top { top: auto; bottom: 70px; width: 95vw; flex-wrap: wrap; justify-content: center; padding: 8px 6px; border-radius: 20px; gap: 2px; }
+            .tool-btn { width: 38px; height: 38px; } .tool-separator { height: 24px; } .preset-colors { display: none; }
+            .size-control { display: flex; order: 99; flex: 1 0 100%; justify-content: center; margin: 4px 0 0; padding: 4px 10px 2px; gap: 10px; }
+            .size-control label { font-size: 10px; min-width: 42px; text-align: right; }
+            .size-slider { width: min(58vw, 230px); height: 8px; }
+            .size-slider::-webkit-slider-thumb { width: 24px; height: 24px; }
+            .size-slider::-moz-range-thumb { width: 24px; height: 24px; }
+            .panel-left { top: 84px; bottom: auto; left: 8px; padding: 6px; border-radius: 14px; } .panel-right { top: 84px; bottom: auto; right: 8px; padding: 6px; border-radius: 14px; }
+            .action-btn { width: 36px; height: 36px; }
+            .drawing-area { border-radius: 14px; }
+            .tableros-bar { bottom: 12px; width: 95vw; padding: 5px 6px; } .tab-btn { min-width: 80px; height: 36px; font-size: 11px; }
+            .zoom-indicator { bottom: 130px; right: 10px; } .brush-preview { display: none !important; } .text-input-overlay textarea { width: 90vw; min-width: 0; font-size: 14px; }
+            .tab-label, .tab-cloud-icon { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-animation"><div class="orb"></div><div class="orb"></div><div class="orb"></div><div class="orb"></div></div>
+    <div class="brush-preview" id="brushPreview"></div>
+
+    <div class="toolbar-top glass-strong" id="toolbarTop">
+        <button class="tool-btn active" id="btnDraw" data-tool="draw" data-tooltip="Dibujar"><svg><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg></button>
+        <button class="tool-btn" id="btnEraser" data-tool="eraser" data-tooltip="Borrador"><svg><path d="M20 20H7L3 16l9-9 8 8-4 4"/><path d="M6.5 13.5l5-5"/></svg></button>
+        <button class="tool-btn" id="btnLine" data-tool="line" data-tooltip="Línea"><svg><line x1="5" y1="19" x2="19" y2="5"/></svg></button>
+        <button class="tool-btn" id="btnRect" data-tool="rect" data-tooltip="Rectángulo"><svg><rect x="3" y="3" width="18" height="18" rx="2"/></svg></button>
+        <button class="tool-btn" id="btnCircle" data-tool="circle" data-tooltip="Círculo"><svg><circle cx="12" cy="12" r="10"/></svg></button>
+        <button class="tool-btn" id="btnTriangle" data-tool="triangle" data-tooltip="Triángulo"><svg><polygon points="12,2 22,22 2,22"/></svg></button>
+        <div class="tool-separator"></div>
+        <button class="tool-btn" id="btnText" data-tool="text" data-tooltip="Texto"><svg><polyline points="4,7 4,4 20,4 20,7"/><line x1="12" y1="4" x2="12" y2="20"/><line x1="8" y1="20" x2="16" y2="20"/></svg></button>
+        <button class="tool-btn" id="btnArrow" data-tool="arrow" data-tooltip="Flecha"><svg><line x1="5" y1="19" x2="19" y2="5"/><polyline points="12,5 19,5 19,12"/></svg></button>
+        <button class="tool-btn" id="btnSelect" data-tool="select" data-tooltip="Seleccionar/Mover"><svg><path d="M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z"/><path d="M13 13l6 6"/></svg></button>
+        <div class="tool-separator"></div>
+        <div class="color-picker-wrapper"><div class="color-preview" id="colorPreview" style="background:#ffffff"></div><input type="color" id="colorPicker" value="#ffffff"></div>
+        <div class="preset-colors">
+            <div class="preset-color active" style="background:#ffffff" data-color="#ffffff"></div><div class="preset-color" style="background:#ef4444" data-color="#ef4444"></div><div class="preset-color" style="background:#f59e0b" data-color="#f59e0b"></div><div class="preset-color" style="background:#10b981" data-color="#10b981"></div><div class="preset-color" style="background:#3b82f6" data-color="#3b82f6"></div><div class="preset-color" style="background:#8b5cf6" data-color="#8b5cf6"></div>
+        </div>
+        <div class="size-control"><label>Grosor</label><input type="range" class="size-slider" id="sizeSlider" min="1" max="40" value="3"></div>
+    </div>
+
+    <div class="panel-right glass" id="panelRight">
+        <button class="action-btn" id="btnUndo" data-tooltip="Deshacer"><svg><polyline points="1,4 1,10 7,10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg></button>
+        <button class="action-btn" id="btnRedo" data-tooltip="Rehacer"><svg><polyline points="23,4 23,10 17,10"/><path d="M20.49 15a9 9 0 1 1-2.13-9.36L23 10"/></svg></button>
+        <button class="action-btn" id="btnClear" data-tooltip="Limpiar tablero"><svg><polyline points="3,6 5,6 21,6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
+        <button class="action-btn" id="btnImport" data-tooltip="Importar imagen"><svg><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21,15 16,10 5,21"/></svg></button>
+        <button class="action-btn" id="btnExport" data-tooltip="Exportar como PNG"><svg><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+        <button class="action-btn" id="btnZoomIn" data-tooltip="Zoom +"><svg><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg></button>
+        <button class="action-btn" id="btnZoomOut" data-tooltip="Zoom -"><svg><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/></svg></button>
+        <button class="action-btn" id="btnSyncCloud" data-tooltip="Subir a la nube ☁️" style="margin-top:8px;"><svg><path d="M17.5 19c0-1.7-1.3-3-3-3h-1.1c-.1-2.1-1.7-3.9-3.9-4.2-.2-2.3-2.2-4.1-4.5-4.1-2.4 0-4.3 1.9-4.5 4.3-1.7.4-3 1.9-3 3.7 0 2.1 1.7 3.8 3.8 3.8h13.2c1.7 0 3-1.3 3-3z"/><path d="M14 16v-3m0 0l-2 2m2-2l2 2"/></svg></button>
+    </div>
+
+    <div class="canvas-container" id="canvasContainer">
+        <div class="drawing-area" id="drawingArea">
+            <canvas id="whiteboard"></canvas>
+            <canvas id="previewCanvas"></canvas>
+        </div>
+    </div>
+
+    <div class="text-input-overlay" id="textOverlay"><textarea id="textInput" rows="1" spellcheck="false"></textarea></div>
+
+    <div class="tableros-bar glass-strong" id="tablerosBar">
+        <div class="tab-section" id="localTabs"><span class="tab-label">Local</span></div>
+        <div style="width:1px;height:24px;background:rgba(255,255,255,0.1);margin:0 4px;"></div>
+        <div class="tab-section" id="cloudTabs"><span class="tab-label">Nube</span></div>
+        <button class="tab-add" id="tabAdd" data-tooltip="Nuevo tablero local">+</button>
+    </div>
+    <div class="zoom-indicator" id="zoomIndicator">100%</div>
+
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-content glass-strong" id="modalContent">
+            <h3 id="modalTitle">Confirmar</h3>
+            <p id="modalMessage">¿Estás seguro?</p>
+            <div class="modal-buttons">
+                <button class="modal-btn" id="modalCancel">Cancelar</button>
+                <button class="modal-btn danger" id="modalConfirm">Eliminar</button>
+            </div>
+        </div>
+    </div>
+    <div class="notification" id="notification"></div>
+    <input type="file" id="fileInput" accept="image/*">
+
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
+    <script>
+    (function() {
+        'use strict';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCMRC8FN_XM7cG-4hX80dBfpFb3reQ8Q4c",
+            authDomain: "board-1b7bb.firebaseapp.com",
+            projectId: "board-1b7bb",
+            storageBucket: "board-1b7bb.firebasestorage.app",
+            messagingSenderId: "501856414607",
+            appId: "1:501856414607:web:b98eba550c8cfbc83939fa",
+            measurementId: "G-M0G97LKXBK"
+        };
+
+        let db = null;
+        try {
+            firebase.initializeApp(firebaseConfig);
+            db = firebase.firestore();
+            db.settings({ cacheSizeBytes: 1000000 });
+        } catch(e) { console.warn('Firebase no configurado'); }
+
+        const state = {
+            boards: [], activeBoardId: null, currentTool: 'draw',
+            currentColor: '#ffffff', brushSize: 3,
+            zoom: 1, panX: 0, panY: 0, isDrawing: false, isPanning: false,
+            spacePressed: false, lastX: 0, lastY: 0, startX: 0, startY: 0,
+            history: {}, historyIndex: {}, boardIdCounter: 0,
+            selectedObject: null, isDragging: false, isResizing: false, resizeHandle: null,
+            dragStartX: 0, dragStartY: 0, objStartX: 0, objStartY: 0, objStartW: 0, objStartH: 0,
+            activePointerId: null, hasCustomView: false
+        };
+        const BOARD_WIDTH = 1600;
+        const BOARD_HEIGHT = 900;
+
+        const canvas = document.getElementById('whiteboard');
+        const ctx = canvas.getContext('2d');
+        const previewCanvas = document.getElementById('previewCanvas');
+        const previewCtx = previewCanvas.getContext('2d');
+        const drawingArea = document.getElementById('drawingArea');
+        const tablerosBar = document.getElementById('tablerosBar');
+        const tabAdd = document.getElementById('tabAdd');
+        const localTabsSection = document.getElementById('localTabs');
+        const cloudTabsSection = document.getElementById('cloudTabs');
+        const colorPicker = document.getElementById('colorPicker');
+        const colorPreview = document.getElementById('colorPreview');
+        const sizeSlider = document.getElementById('sizeSlider');
+        const textOverlay = document.getElementById('textOverlay');
+        const textInput = document.getElementById('textInput');
+        const modalOverlay = document.getElementById('modalOverlay');
+        const modalCancel = document.getElementById('modalCancel');
+        const modalConfirm = document.getElementById('modalConfirm');
+        const notification = document.getElementById('notification');
+        const fileInput = document.getElementById('fileInput');
+        const zoomIndicator = document.getElementById('zoomIndicator');
+        const brushPreview = document.getElementById('brushPreview');
+
+        // ===== SYNC: Solo suscripción al tablero activo =====
+        let activeBoardUnsub = null;
+        let localUpdates = {};
+        let cloudSaveTimeout = null;
+        let renderToken = 0;
+        const imageCache = new Map();
+
+        function getFitZoom() {
+            const reservedHeight = window.innerWidth <= 850 ? 220 : 150;
+            const availableWidth = Math.max(320, window.innerWidth - 32);
+            const availableHeight = Math.max(260, window.innerHeight - reservedHeight);
+            return Math.max(0.25, Math.min(availableWidth / BOARD_WIDTH, availableHeight / BOARD_HEIGHT, 1));
+        }
+
+        function fitBoardToViewport() {
+            state.zoom = getFitZoom();
+            state.panX = 0;
+            state.panY = 0;
+            state.hasCustomView = false;
+            updateTransform();
+        }
+
+        function resizeCanvas() {
+            canvas.width = BOARD_WIDTH; canvas.height = BOARD_HEIGHT;
+            previewCanvas.width = BOARD_WIDTH; previewCanvas.height = BOARD_HEIGHT;
+            fitBoardToViewport();
+            if (state.activeBoardId) renderBoard(state.activeBoardId);
+        }
+        window.addEventListener('resize', resizeCanvas); resizeCanvas();
+
+        function updateTransform() {
+            drawingArea.style.transform = `translate(${state.panX}px, ${state.panY}px) scale(${state.zoom})`;
+            zoomIndicator.textContent = `${Math.round(state.zoom * 100)}%`;
+        }
+
+        function getMousePos(e) {
+            const rect = drawingArea.getBoundingClientRect();
+            return { x: (e.clientX - rect.left) / state.zoom, y: (e.clientY - rect.top) / state.zoom };
+        }
+
+        function boardToClient(x, y) {
+            const rect = drawingArea.getBoundingClientRect();
+            return { x: rect.left + x * state.zoom, y: rect.top + y * state.zoom };
+        }
+
+        function normalizeBoard(board) {
+            if (!board) return board;
+            board.objects = Array.isArray(board.objects) ? board.objects : [];
+            if (board.imageData && board.objects.length > 0 && !board.keepImageData) board.imageData = null;
+            delete board.zoom;
+            delete board.panX;
+            delete board.panY;
+            return board;
+        }
+
+        function getCachedImage(src, onload) {
+            let img = imageCache.get(src);
+            if (!img) {
+                img = new Image();
+                imageCache.set(src, img);
+                img.onload = () => { if (onload) onload(); };
+                img.src = src;
+            } else if (!img.complete && onload) {
+                img.addEventListener('load', onload, { once: true });
+            }
+            return img;
+        }
+
+        function renderBoard(boardId) {
+            const board = normalizeBoard(state.boards.find(b => b.id === boardId)); if (!board) return;
+            const token = ++renderToken;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const drawObjects = () => {
+                if (token !== renderToken) return;
+                if (board.objects) board.objects.forEach(obj => drawObject(obj));
+            };
+            if (board.imageData) {
+                const img = getCachedImage(board.imageData, () => renderBoard(boardId));
+                if (img.complete && img.naturalWidth) {
+                    ctx.drawImage(img, 0, 0);
+                    drawObjects();
+                }
+            } else {
+                drawObjects();
+            }
+        }
+
+        function drawObject(obj) {
+            ctx.save(); ctx.strokeStyle = obj.color || state.currentColor; ctx.fillStyle = obj.color || state.currentColor;
+            ctx.lineWidth = obj.size || state.brushSize; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+            switch(obj.type) {
+                case 'path': if (!obj.points || obj.points.length < 2) break; ctx.globalCompositeOperation = obj.erase ? 'destination-out' : 'source-over'; ctx.strokeStyle = obj.erase ? 'rgba(0,0,0,1)' : obj.color; ctx.lineWidth = obj.erase ? obj.size * 3 : obj.size; ctx.beginPath(); ctx.moveTo(obj.points[0].x, obj.points[0].y); for (let i = 1; i < obj.points.length; i++) ctx.lineTo(obj.points[i].x, obj.points[i].y); ctx.stroke(); ctx.globalCompositeOperation = 'source-over'; break;
+                case 'rect': if (obj.fill) ctx.fillRect(obj.x, obj.y, obj.width, obj.height); ctx.strokeRect(obj.x, obj.y, obj.width, obj.height); break;
+                case 'circle': { const cx = obj.x + obj.width/2, cy = obj.y + obj.height/2, rx = Math.abs(obj.width)/2, ry = Math.abs(obj.height)/2; ctx.beginPath(); ctx.ellipse(cx, cy, Math.max(rx,1), Math.max(ry,1), 0, 0, 2*Math.PI); if (obj.fill) ctx.fill(); ctx.stroke(); break; }
+                case 'triangle': { ctx.beginPath(); ctx.moveTo(obj.x + obj.width/2, obj.y); ctx.lineTo(obj.x + obj.width, obj.y + obj.height); ctx.lineTo(obj.x, obj.y + obj.height); ctx.closePath(); if (obj.fill) ctx.fill(); ctx.stroke(); break; }
+                case 'line': ctx.beginPath(); ctx.moveTo(obj.x, obj.y); ctx.lineTo(obj.x + obj.width, obj.y + obj.height); ctx.stroke(); break;
+                case 'arrow': { const a = Math.atan2(obj.height, obj.width), h = Math.max(15, obj.size*3); ctx.beginPath(); ctx.moveTo(obj.x, obj.y); ctx.lineTo(obj.x+obj.width, obj.y+obj.height); ctx.lineTo(obj.x+obj.width - h*Math.cos(a-Math.PI/6), obj.y+obj.height - h*Math.sin(a-Math.PI/6)); ctx.moveTo(obj.x+obj.width, obj.y+obj.height); ctx.lineTo(obj.x+obj.width - h*Math.cos(a+Math.PI/6), obj.y+obj.height - h*Math.sin(a+Math.PI/6)); ctx.stroke(); break; }
+                case 'text': ctx.font = `${obj.size||20}px Inter, sans-serif`; ctx.textBaseline = 'top'; obj.text.split('\n').forEach((l,i) => ctx.fillText(l, obj.x, obj.y + i*(obj.size||20)*1.2)); break;
+                case 'image': { const im = getCachedImage(obj.src, () => renderBoard(state.activeBoardId)); if (im.complete && im.naturalWidth) ctx.drawImage(im, obj.x, obj.y, obj.width, obj.height); break; }
+            }
+            if (obj === state.selectedObject) {
+                const bounds = getObjectBounds(obj);
+                if (!bounds) { ctx.restore(); return; }
+                ctx.shadowColor = 'transparent'; ctx.shadowBlur = 0; ctx.strokeStyle = '#3b82f6'; ctx.lineWidth = 2; ctx.setLineDash([6,3]);
+                ctx.strokeRect(bounds.x-8, bounds.y-8, bounds.width+16, bounds.height+16); ctx.setLineDash([]);
+                if (obj.type !== 'path') {
+                    const handles = getHandlePositions(obj, 8); ctx.fillStyle = '#fff'; ctx.strokeStyle = '#3b82f6'; ctx.lineWidth = 2;
+                    handles.forEach(p => { ctx.beginPath(); ctx.arc(p.x, p.y, 5, 0, 2*Math.PI); ctx.fill(); ctx.stroke(); });
+                }
+            }
+            ctx.restore();
+        }
+
+        function getObjectBounds(obj) {
+            if (!obj) return null;
+            if (obj.type === 'path') {
+                if (!obj.points || obj.points.length === 0) return null;
+                const xs = obj.points.map(p => p.x), ys = obj.points.map(p => p.y);
+                const pad = obj.erase ? (obj.size || 1) * 3 : (obj.size || 1);
+                const minX = Math.min(...xs) - pad, minY = Math.min(...ys) - pad;
+                const maxX = Math.max(...xs) + pad, maxY = Math.max(...ys) + pad;
+                return { x: minX, y: minY, width: Math.max(1, maxX - minX), height: Math.max(1, maxY - minY) };
+            }
+            const x = Math.min(obj.x || 0, (obj.x || 0) + (obj.width || 0));
+            const y = Math.min(obj.y || 0, (obj.y || 0) + (obj.height || 0));
+            return { x, y, width: Math.max(1, Math.abs(obj.width || 20)), height: Math.max(1, Math.abs(obj.height || 20)) };
+        }
+
+        function moveObject(obj, dx, dy) {
+            if (!obj) return;
+            if (obj.type === 'path' && obj.points) obj.points.forEach(p => { p.x += dx; p.y += dy; });
+            else { obj.x = (obj.x || 0) + dx; obj.y = (obj.y || 0) + dy; }
+        }
+
+        function deleteSelectedObject() {
+            if (!state.selectedObject) return false;
+            const board = state.boards.find(b => b.id === state.activeBoardId);
+            if (!board) return false;
+            board.objects = board.objects.filter(o => o !== state.selectedObject);
+            state.selectedObject = null;
+            renderBoard(state.activeBoardId);
+            saveState();
+            showNotification('Elemento eliminado');
+            return true;
+        }
+
+        function getHandlePositions(obj, pad) { const b=getObjectBounds(obj); if(!b || obj.type === 'path') return []; const x=b.x-pad, y=b.y-pad, w=b.width+pad*2, h=b.height+pad*2; return [{id:'tl',x,y},{id:'tr',x:x+w,y},{id:'bl',x,y:y+h},{id:'br',x:x+w,y:y+h},{id:'tm',x:x+w/2,y},{id:'bm',x:x+w/2,y:y+h},{id:'ml',x,y:y+h/2},{id:'mr',x:x+w,y:y+h/2}]; }
+
+        // ===== TABLEROS =====
+        function createBoard(name) {
+            const id = `board_${state.boardIdCounter++}`;
+            state.boards.push({ id, name: name || `Tablero ${state.boards.filter(b=>!b.isCloud).length+1}`, imageData: null, objects: [], isCloud: false, cloudId: null });
+            state.history[id] = []; state.historyIndex[id] = -1;
+            createTab(id); switchBoard(id); return id;
+        }
+
+        function switchBoard(id) {
+            if (state.activeBoardId && state.activeBoardId !== id) saveCurrentBoard();
+            unsubscribeActiveBoard();
+            state.activeBoardId = id; state.selectedObject = null;
+            const board = state.boards.find(b => b.id === id);
+            if (board) {
+                normalizeBoard(board);
+                fitBoardToViewport();
+                document.querySelectorAll('.tab-btn').forEach(t => t.classList.toggle('active', t.dataset.boardId === id));
+                renderBoard(id);
+                if (!state.history[id] || state.history[id].length === 0) saveState();
+                subscribeActiveBoard(board);
+            }
+        }
+
+        function saveCurrentBoard() {
+            const board = state.boards.find(b => b.id === state.activeBoardId);
+            if (board) {
+                normalizeBoard(board);
+            }
+        }
+
+        async function deleteBoard(id) {
+            const idx = state.boards.findIndex(b => b.id === id); if (idx === -1) return;
+            const board = state.boards[idx];
+            if (state.boards.length <= 1) { showNotification('Debes tener al menos un tablero', 'error'); return; }
+
+            if (board.isCloud && board.cloudId && db) {
+                showModal('Eliminar tablero', `¿Eliminar "${board.name}" de la nube?`, 'danger', async () => {
+                    try { await db.collection('boards').doc(board.cloudId).delete(); } catch(e) {}
+                    performDelete(idx, id);
+                });
+            } else {
+                showModal('Eliminar tablero', `¿Eliminar "${board.name}"?`, 'danger', () => performDelete(idx, id));
+            }
+        }
+
+        function performDelete(idx, id) {
+            unsubscribeActiveBoard();
+            delete state.history[id]; delete state.historyIndex[id];
+            state.boards.splice(idx, 1);
+            const tabEl = document.querySelector(`.tab-btn[data-board-id="${id}"]`);
+            if (tabEl) tabEl.remove();
+            if (state.activeBoardId === id) {
+                const next = idx >= state.boards.length ? Math.max(0, state.boards.length - 1) : idx;
+                if (state.boards.length > 0) switchBoard(state.boards[next].id);
+            }
+            // Solo guardar en localStorage los tableros locales
+            saveToLocal();
+            showNotification('Tablero eliminado');
+        }
+
+        function createTab(id) {
+            if (document.querySelector(`.tab-btn[data-board-id="${id}"]`)) return;
+            const board = state.boards.find(b => b.id === id); if (!board) return;
+
+            const tab = document.createElement('button');
+            tab.className = `tab-btn${board.isCloud ? ' cloud-synced' : ''}`;
+            tab.dataset.boardId = id;
+            tab.innerHTML = `<span class="tab-name">${board.name}</span>${board.isCloud ? '<span class="tab-cloud-icon">☁️</span>' : ''}<button class="tab-close" data-board-id="${id}">×</button>`;
+
+            tab.addEventListener('click', (e) => { if (!e.target.classList.contains('tab-close')) switchBoard(id); });
+            tab.addEventListener('dblclick', (e) => { e.stopPropagation(); startRenameTab(id, tab); });
+            tab.querySelector('.tab-close').addEventListener('click', (e) => { e.stopPropagation(); e.preventDefault(); deleteBoard(id); });
+
+            if (board.isCloud) { cloudTabsSection.insertBefore(tab, cloudTabsSection.querySelector('.tab-label')?.nextSibling || null); }
+            else { localTabsSection.insertBefore(tab, localTabsSection.querySelector('.tab-label')?.nextSibling || null); }
+        }
+
+        function startRenameTab(id, tabEl) {
+            const board = state.boards.find(b => b.id === id); if (!board) return;
+            const nameSpan = tabEl.querySelector('.tab-name'); const oldName = board.name;
+            nameSpan.innerHTML = '';
+            const input = document.createElement('input'); input.type = 'text'; input.className = 'tab-name-input'; input.value = oldName;
+            nameSpan.appendChild(input); input.focus(); input.select();
+            const finish = () => {
+                input.removeEventListener('blur', finish);
+                board.name = input.value.trim() || oldName;
+                nameSpan.textContent = board.name;
+                if (board.isCloud && board.cloudId && db) db.collection('boards').doc(board.cloudId).update({ name: board.name }).catch(()=>{});
+                saveToLocal();
+            };
+            input.addEventListener('blur', finish);
+            input.addEventListener('keydown', (e) => { if(e.key==='Enter') input.blur(); if(e.key==='Escape'){input.value=oldName;input.blur();} e.stopPropagation(); });
+        }
+
+        // ===== HISTORIAL =====
+        function saveState() {
+            const bid = state.activeBoardId; if (!bid) return;
+            if (!state.history[bid]) { state.history[bid] = []; state.historyIndex[bid] = -1; }
+            const board = normalizeBoard(state.boards.find(b => b.id === bid));
+            const snap = { imageData: board?.imageData || null, objects: JSON.parse(JSON.stringify(board?.objects || [])) };
+            if (state.historyIndex[bid] < state.history[bid].length - 1) state.history[bid] = state.history[bid].slice(0, state.historyIndex[bid] + 1);
+            state.history[bid].push(snap); state.historyIndex[bid] = state.history[bid].length - 1;
+            if (state.history[bid].length > 40) { state.history[bid].shift(); state.historyIndex[bid]--; }
+            scheduleCloudSave();
+        }
+
+        function undo() { const bid = state.activeBoardId; if (state.history[bid] && state.historyIndex[bid] > 0) { state.historyIndex[bid]--; restoreState(state.history[bid][state.historyIndex[bid]]); showNotification('Deshacer'); } }
+        function redo() { const bid = state.activeBoardId; if (state.history[bid] && state.historyIndex[bid] < state.history[bid].length - 1) { state.historyIndex[bid]++; restoreState(state.history[bid][state.historyIndex[bid]]); showNotification('Rehacer'); } }
+        function restoreState(snap) { const board = state.boards.find(b => b.id === state.activeBoardId); if (board) { board.imageData = snap.imageData || null; board.objects = snap.objects ? [...snap.objects] : []; normalizeBoard(board); } renderBoard(state.activeBoardId); }
+
+        // ===== SELECCIÓN =====
+        function findObjectAt(px, py) { const board = state.boards.find(b => b.id === state.activeBoardId); if (!board || !board.objects) return null; for (let i = board.objects.length-1; i >= 0; i--) { const obj = board.objects[i], pad = Math.max(12, (obj.size || 1) * 2); if (obj.type === 'path') { if(obj.points){for(let j=1;j<obj.points.length;j++){if(pointToLineDist(px,py,obj.points[j-1].x,obj.points[j-1].y,obj.points[j].x,obj.points[j].y)<pad)return obj;}} } else if (obj.type === 'line' || obj.type === 'arrow') { if(pointToLineDist(px,py,obj.x,obj.y,obj.x+obj.width,obj.y+obj.height)<pad) return obj; } else { const b=getObjectBounds(obj); if(b && px>=b.x-pad&&px<=b.x+b.width+pad&&py>=b.y-pad&&py<=b.y+b.height+pad) return obj; } } return null; }
+        function pointToLineDist(px,py,x1,y1,x2,y2) { const A=px-x1,B=py-y1,C=x2-x1,D=y2-y1, dot=A*C+B*D, lenSq=C*C+D*D; let p=lenSq!==0?dot/lenSq:-1; p=Math.max(0,Math.min(1,p)); const xx=x1+p*C, yy=y1+p*D; return Math.sqrt((px-xx)**2+(py-yy)**2); }
+        function findHandleAt(px,py) { if(!state.selectedObject) return null; return getHandlePositions(state.selectedObject, 8).find(h => Math.abs(px-h.x)<10 && Math.abs(py-h.y)<10) || null; }
+
+        // ===== EVENTOS CANVAS =====
+        canvas.addEventListener('contextmenu', e => e.preventDefault());
+        let currentStroke = null;
+        const activePointers = new Map();
+        let pinchGesture = null;
+        let lastTextTap = { obj: null, time: 0 };
+
+        function cancelPointerWork() {
+            state.isDrawing = false;
+            state.isDragging = false;
+            state.isResizing = false;
+            state.isPanning = false;
+            currentStroke = null;
+            clearShapePreview();
+            ctx.beginPath();
+        }
+
+        function getPointerPair() {
+            const points = Array.from(activePointers.values());
+            if (points.length < 2) return null;
+            const [a, b] = points;
+            const centerX = (a.clientX + b.clientX) / 2;
+            const centerY = (a.clientY + b.clientY) / 2;
+            return {
+                centerX,
+                centerY,
+                distance: Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY)
+            };
+        }
+
+        function beginPinchGesture() {
+            const pair = getPointerPair();
+            if (!pair || pair.distance < 1) return;
+            cancelPointerWork();
+            state.activePointerId = null;
+            state.selectedObject = null;
+            pinchGesture = {
+                startDistance: pair.distance,
+                startZoom: state.zoom,
+                startPanX: state.panX,
+                startPanY: state.panY,
+                startCenterX: pair.centerX,
+                startCenterY: pair.centerY,
+                startBoardPoint: getMousePos({ clientX: pair.centerX, clientY: pair.centerY })
+            };
+            canvas.style.cursor = 'grab';
+            renderBoard(state.activeBoardId);
+        }
+
+        function updatePinchGesture() {
+            if (!pinchGesture) return;
+            const pair = getPointerPair();
+            if (!pair || pair.distance < 1) return;
+            const nextZoom = Math.max(0.25, Math.min(pinchGesture.startZoom * (pair.distance / pinchGesture.startDistance), 3));
+            state.zoom = nextZoom;
+            state.panX = pinchGesture.startPanX + (pair.centerX - pinchGesture.startCenterX);
+            state.panY = pinchGesture.startPanY + (pair.centerY - pinchGesture.startCenterY);
+            updateTransform();
+            const after = getMousePos({ clientX: pair.centerX, clientY: pair.centerY });
+            state.panX += (after.x - pinchGesture.startBoardPoint.x) * state.zoom;
+            state.panY += (after.y - pinchGesture.startBoardPoint.y) * state.zoom;
+            updateTransform();
+        }
+
+        function beginCanvasInteraction(e) {
+            e.preventDefault();
+            if (e.button === 2) return;
+            if (canvas.setPointerCapture && e.pointerId !== undefined) canvas.setPointerCapture(e.pointerId);
+            activePointers.set(e.pointerId ?? 'mouse', { clientX: e.clientX, clientY: e.clientY });
+            if (activePointers.size >= 2) { beginPinchGesture(); return; }
+            if (state.activePointerId !== null) return;
+            state.activePointerId = e.pointerId ?? 'mouse';
+            const pos = getMousePos(e);
+            const isTouch = e.pointerType === 'touch';
+            const shouldPan = e.button === 1 || state.spacePressed || (isTouch && state.currentTool === 'select' && !findObjectAt(pos.x, pos.y));
+            if (shouldPan) { state.hasCustomView=true; state.isPanning=true; state.isDrawing=false; state.lastX=e.clientX; state.lastY=e.clientY; canvas.style.cursor='grabbing'; return; }
+            state.isDrawing = true; state.lastX = pos.x; state.lastY = pos.y; state.startX = pos.x; state.startY = pos.y;
+            if (state.currentTool === 'text') { state.isDrawing = false; showTextInput(e.clientX, e.clientY); return; }
+            if (state.currentTool === 'select') {
+                const h = findHandleAt(pos.x, pos.y);
+                if (h) { const b=getObjectBounds(state.selectedObject); state.isResizing=true; state.resizeHandle=h.id; state.objStartX=b.x; state.objStartY=b.y; state.objStartW=b.width||20; state.objStartH=b.height||20; state.dragStartX=pos.x; state.dragStartY=pos.y; return; }
+                const obj = findObjectAt(pos.x, pos.y);
+                if (obj) {
+                    const now = Date.now();
+                    const editText = obj.type === 'text' && (e.detail >= 2 || (lastTextTap.obj === obj && now - lastTextTap.time < 520));
+                    lastTextTap = { obj, time: now };
+                    state.selectedObject=obj; renderBoard(state.activeBoardId);
+                    if (editText) { state.isDrawing=false; editSelectedText(); return; }
+                    const b = getObjectBounds(obj);
+                    state.isDragging=true; state.dragStartX=pos.x; state.dragStartY=pos.y; state.objStartX=b?.x || 0; state.objStartY=b?.y || 0; return;
+                }
+                state.selectedObject = null; renderBoard(state.activeBoardId); return;
+            }
+            if (state.currentTool === 'draw' || state.currentTool === 'eraser') { currentStroke = { type: 'path', points: [{x: pos.x, y: pos.y}], color: state.currentColor, size: state.brushSize, erase: state.currentTool === 'eraser' }; ctx.beginPath(); ctx.moveTo(pos.x, pos.y); }
+        }
+
+        function moveCanvasInteraction(e) {
+            if (activePointers.has(e.pointerId ?? 'mouse')) activePointers.set(e.pointerId ?? 'mouse', { clientX: e.clientX, clientY: e.clientY });
+            if (pinchGesture) { if (e.cancelable) e.preventDefault(); updatePinchGesture(); return; }
+            if (state.activePointerId !== null && e.pointerId !== undefined && e.pointerId !== state.activePointerId) return;
+            if (e.cancelable) e.preventDefault();
+            if (e.pointerType !== 'touch') updateBrushPreview(e);
+            if (state.isPanning) { state.hasCustomView=true; state.panX += e.clientX-state.lastX; state.panY += e.clientY-state.lastY; state.lastX=e.clientX; state.lastY=e.clientY; updateTransform(); return; }
+            if (state.isDragging && state.selectedObject) { const pos=getMousePos(e); const dx=pos.x-state.dragStartX, dy=pos.y-state.dragStartY; const b=getObjectBounds(state.selectedObject); if(b) moveObject(state.selectedObject, state.objStartX+dx-b.x, state.objStartY+dy-b.y); renderBoard(state.activeBoardId); return; }
+            if (state.isResizing && state.selectedObject) {
+                const pos=getMousePos(e); const dx=pos.x-state.dragStartX, dy=pos.y-state.dragStartY, h=state.resizeHandle;
+                let nx=state.objStartX, ny=state.objStartY, nw=state.objStartW, nh=state.objStartH;
+                if(h.includes('r')) nw+=dx; else if(h.includes('l')){nx+=dx;nw-=dx;}
+                if(h.includes('b')) nh+=dy; else if(h.includes('t')){ny+=dy;nh-=dy;}
+                if(state.selectedObject.type==='text'){
+                    const newHeight = Math.max(12, Math.min(80, nh));
+                    state.selectedObject.size = newHeight;
+                    const metrics = getTextMetrics(state.selectedObject.text, newHeight);
+                    state.selectedObject.height = metrics.height;
+                    state.selectedObject.width = metrics.width;
+                } else { state.selectedObject.x=nx; state.selectedObject.y=ny; state.selectedObject.width=nw; state.selectedObject.height=nh; }
+                renderBoard(state.activeBoardId); return;
+            }
+            if (!state.isDrawing) return;
+            const pos = getMousePos(e);
+            if (currentStroke) currentStroke.points.push({x: pos.x, y: pos.y});
+            if (state.currentTool === 'draw') { ctx.strokeStyle=state.currentColor; ctx.lineWidth=state.brushSize; ctx.lineCap='round'; ctx.lineJoin='round'; ctx.lineTo(pos.x, pos.y); ctx.stroke(); }
+            else if (state.currentTool === 'eraser') { ctx.globalCompositeOperation='destination-out'; ctx.lineWidth=state.brushSize*3; ctx.lineCap='round'; ctx.lineTo(pos.x, pos.y); ctx.stroke(); ctx.globalCompositeOperation='source-over'; }
+            else if (['line','rect','circle','triangle','arrow'].includes(state.currentTool)) drawShapePreview(pos.x, pos.y);
+            state.lastX = pos.x; state.lastY = pos.y;
+        }
+
+        function endCanvasInteraction(e) {
+            if (canvas.releasePointerCapture && e.pointerId !== undefined) {
+                try { canvas.releasePointerCapture(e.pointerId); } catch(err) {}
+            }
+            activePointers.delete(e.pointerId ?? 'mouse');
+            if (pinchGesture) {
+                if (e.cancelable) e.preventDefault();
+                if (activePointers.size < 2) {
+                    pinchGesture = null;
+                    state.activePointerId = null;
+                    updateCursorStyle();
+                } else {
+                    beginPinchGesture();
+                }
+                return;
+            }
+            if (state.activePointerId !== null && e.pointerId !== undefined && e.pointerId !== state.activePointerId) return;
+            if (e.cancelable) e.preventDefault();
+            state.activePointerId = null;
+            if (state.isPanning) { state.isPanning=false; updateCursorStyle(); return; }
+            if (state.isDragging || state.isResizing) { state.isDragging=false; state.isResizing=false; saveState(); return; }
+            if (!state.isDrawing) { currentStroke = null; clearShapePreview(); return; }
+            state.isDrawing = false;
+            const pos = getMousePos(e);
+            if (currentStroke && currentStroke.points.length > 1) { addObject(currentStroke); currentStroke = null; }
+            else if (['line','rect','circle','triangle','arrow'].includes(state.currentTool)) { addObject({ type: state.currentTool, x: state.startX, y: state.startY, width: pos.x-state.startX, height: pos.y-state.startY, color: state.currentColor, size: state.brushSize, fill: false }); }
+            clearShapePreview(); ctx.beginPath();
+        }
+
+        canvas.addEventListener('pointerdown', beginCanvasInteraction);
+        canvas.addEventListener('pointermove', moveCanvasInteraction);
+        canvas.addEventListener('pointerup', endCanvasInteraction);
+        canvas.addEventListener('pointercancel', endCanvasInteraction);
+        canvas.addEventListener('pointerleave', (e) => { if (state.activePointerId === null) brushPreview.style.display='none'; });
+
+        function addObject(obj) { const board = state.boards.find(b => b.id === state.activeBoardId); if(!board)return; board.objects.push(obj); renderBoard(state.activeBoardId); saveState(); }
+        function updateCursorStyle() { canvas.style.cursor = state.spacePressed ? 'grab' : state.currentTool==='text'?'text':state.currentTool==='select'?'default':'crosshair'; }
+
+        // ===== TEXTO =====
+        let textFinishCallback = null;
+        function registerTextFinish(callback) {
+            if (textFinishCallback) textInput.removeEventListener('blur', textFinishCallback);
+            textFinishCallback = () => {
+                const activeCallback = textFinishCallback;
+                if (activeCallback) textInput.removeEventListener('blur', activeCallback);
+                textFinishCallback = null;
+                callback();
+            };
+            textInput.addEventListener('blur', textFinishCallback);
+        }
+
+        function getTextMetrics(text, size) {
+            const lines = (text || '').split('\n');
+            ctx.save();
+            ctx.font = `${size}px Inter, sans-serif`;
+            const width = Math.max(40, ...lines.map(line => ctx.measureText(line || ' ').width));
+            ctx.restore();
+            return { width, height: Math.max(size * 1.4, lines.length * size * 1.2) };
+        }
+
+        function placeTextOverlay(clientX, clientY, width, height) {
+            const maxLeft = window.innerWidth - Math.min(width || 260, window.innerWidth - 24) - 12;
+            const maxTop = window.innerHeight - Math.min(height || 80, window.innerHeight - 24) - 12;
+            textOverlay.style.left = `${Math.max(12, Math.min(clientX, maxLeft))}px`;
+            textOverlay.style.top = `${Math.max(12, Math.min(clientY, maxTop))}px`;
+        }
+
+        function autosizeTextInput() {
+            textInput.style.height = 'auto';
+            textInput.style.height = `${Math.min(Math.max(52, textInput.scrollHeight + 4), Math.floor(window.innerHeight * 0.45))}px`;
+        }
+
+        function openTextEditor({ obj = null, clientX, clientY }) {
+            const isEdit = !!obj;
+            const size = Math.max(12, Math.min(isEdit ? (obj.size || 20) : state.brushSize * 3 + 10, 48));
+            const startText = isEdit ? obj.text : '';
+            const clientPos = isEdit ? boardToClient(obj.x, obj.y) : { x: clientX, y: clientY };
+            const width = isEdit ? Math.min(Math.max(220, (obj.width || 180) + 44), Math.min(560, window.innerWidth - 24)) : Math.min(320, window.innerWidth - 24);
+
+            textOverlay.style.display = 'block';
+            placeTextOverlay(clientPos.x, clientPos.y, width, isEdit ? (obj.height || 60) + 34 : 80);
+            textInput.value = startText;
+            textInput.style.color = isEdit ? (obj.color || state.currentColor) : state.currentColor;
+            textInput.style.fontSize = `${size}px`;
+            textInput.style.width = `${width}px`;
+            autosizeTextInput();
+
+            let cancelled = false;
+            textInput.oninput = autosizeTextInput;
+            textInput.onkeydown = (e) => {
+                if ((e.key === 'Enter' && !e.shiftKey) || (e.key === 'Enter' && (e.ctrlKey || e.metaKey))) { e.preventDefault(); textInput.blur(); }
+                if (e.key === 'Escape') { cancelled = true; textInput.blur(); }
+                e.stopPropagation();
+            };
+            textInput.onmousedown = (e) => e.stopPropagation();
+            textInput.onpointerdown = (e) => e.stopPropagation();
+
+            registerTextFinish(() => {
+                const value = cancelled ? startText : textInput.value.trim();
+                textOverlay.style.display = 'none';
+                textInput.oninput = null;
+                if (cancelled) return;
+
+                if (isEdit) {
+                    if (!value) { deleteSelectedObject(); return; }
+                    if (value !== obj.text) {
+                        obj.text = value; obj.size = size;
+                        const metrics = getTextMetrics(value, size);
+                        obj.width = metrics.width; obj.height = metrics.height;
+                        renderBoard(state.activeBoardId); saveState();
+                    }
+                    return;
+                }
+
+                if (value) {
+                    const rect = drawingArea.getBoundingClientRect();
+                    const x = (clientX - rect.left) / state.zoom, y = (clientY - rect.top) / state.zoom;
+                    const metrics = getTextMetrics(value, size);
+                    addObject({ type:'text', x, y, width: metrics.width, height: metrics.height, text: value, color: state.currentColor, size });
+                }
+            });
+            setTimeout(() => { textInput.focus(); if (isEdit) textInput.select(); }, 20);
+        }
+
+        function showTextInput(cx, cy) { openTextEditor({ clientX: cx, clientY: cy }); }
+        function editSelectedText() { const obj = state.selectedObject; if (obj?.type === 'text') openTextEditor({ obj }); }
+
+        function updateBrushPreview(e) {
+            if (['draw','eraser'].includes(state.currentTool) && !state.isPanning && !state.isDrawing && !state.isDragging) {
+                brushPreview.style.display='block'; brushPreview.style.left=`${e.clientX}px`; brushPreview.style.top=`${e.clientY}px`;
+                const s = state.currentTool==='eraser'?state.brushSize*3:state.brushSize; brushPreview.style.width=`${s*state.zoom}px`; brushPreview.style.height=`${s*state.zoom}px`;
+                brushPreview.style.borderColor = state.currentTool==='eraser'?'#ff4444':state.currentColor; brushPreview.style.background = state.currentTool==='eraser'?'rgba(255,68,68,0.2)':'rgba(255,255,255,0.1)';
+            } else brushPreview.style.display='none';
+        }
+
+        function drawShapePreview(ex, ey) {
+            previewCtx.clearRect(0,0,previewCanvas.width,previewCanvas.height); previewCtx.beginPath(); previewCtx.strokeStyle=state.currentColor; previewCtx.lineWidth=state.brushSize; previewCtx.lineCap='round'; previewCtx.setLineDash([5,5]); previewCtx.globalAlpha=0.6;
+            if(state.currentTool==='line'){previewCtx.moveTo(state.startX,state.startY);previewCtx.lineTo(ex,ey);previewCtx.stroke();}
+            else if(state.currentTool==='rect'){previewCtx.strokeRect(state.startX,state.startY,ex-state.startX,ey-state.startY);}
+            else if(state.currentTool==='circle'){const cx=state.startX+(ex-state.startX)/2,cy=state.startY+(ey-state.startY)/2,rx=Math.abs(ex-state.startX)/2,ry=Math.abs(ey-state.startY)/2;previewCtx.beginPath();previewCtx.ellipse(cx,cy,rx,ry,0,0,2*Math.PI);previewCtx.stroke();}
+            else if(state.currentTool==='triangle'){previewCtx.beginPath();previewCtx.moveTo(state.startX+(ex-state.startX)/2,state.startY);previewCtx.lineTo(ex,ey);previewCtx.lineTo(state.startX,ey);previewCtx.closePath();previewCtx.stroke();}
+            else if(state.currentTool==='arrow'){previewCtx.beginPath();previewCtx.moveTo(state.startX,state.startY);previewCtx.lineTo(ex,ey);previewCtx.stroke();}
+            previewCtx.setLineDash([]); previewCtx.globalAlpha=1;
+        }
+        function clearShapePreview() { previewCtx.clearRect(0,0,previewCanvas.width,previewCanvas.height); }
+
+        // UI
+        colorPicker.addEventListener('input', e => { state.currentColor=e.target.value; colorPreview.style.background=e.target.value; document.querySelectorAll('.preset-color').forEach(p=>p.classList.remove('active')); });
+        document.querySelectorAll('.preset-color').forEach(el => { el.addEventListener('click', () => { state.currentColor=el.dataset.color; colorPreview.style.background=el.dataset.color; colorPicker.value=el.dataset.color; document.querySelectorAll('.preset-color').forEach(p=>p.classList.remove('active')); el.classList.add('active'); }); });
+        sizeSlider.addEventListener('input', e => { state.brushSize = parseInt(e.target.value); });
+        document.querySelectorAll('.tool-btn[data-tool]').forEach(btn => { btn.addEventListener('click', () => { state.currentTool=btn.dataset.tool; state.selectedObject=null; document.querySelectorAll('.tool-btn[data-tool]').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); updateCursorStyle(); renderBoard(state.activeBoardId); }); });
+
+        document.getElementById('btnUndo').addEventListener('click', undo);
+        document.getElementById('btnRedo').addEventListener('click', redo);
+        document.getElementById('btnClear').addEventListener('click', () => {
+            if (state.selectedObject) { showModal('Eliminar elemento', '¿Eliminar el elemento seleccionado?', 'danger', deleteSelectedObject); return; }
+            showModal('Limpiar tablero', '¿Estás seguro?', 'danger', () => { const board=state.boards.find(b=>b.id===state.activeBoardId); if(board){board.objects=[];board.imageData=null;ctx.clearRect(0,0,canvas.width,canvas.height);saveState();showNotification('Tablero limpiado');} });
+        });
+        document.getElementById('btnImport').addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', (e) => { const file=e.target.files[0]; if(!file)return; const reader=new FileReader(); reader.onload=ev=>{const img=new Image();img.onload=()=>{const pos=getMousePos({clientX:window.innerWidth/2,clientY:window.innerHeight/2});let w=img.width,h=img.height;if(w>500||h>500){const r=Math.min(500/w,500/h);w*=r;h*=r;}addObject({type:'image',x:pos.x-w/2,y:pos.y-h/2,width:w,height:h,src:ev.target.result});showNotification('Imagen importada');};img.src=ev.target.result;};reader.readAsDataURL(file);fileInput.value=''; });
+        document.getElementById('btnExport').addEventListener('click', () => { const l=document.createElement('a');l.download=`${state.boards.find(b=>b.id===state.activeBoardId)?.name||'tablero'}_${Date.now()}.png`;l.href=canvas.toDataURL('image/png');l.click();showNotification('Exportado'); });
+        document.getElementById('btnZoomIn').addEventListener('click', () => { state.hasCustomView=true; state.zoom=Math.min(state.zoom+0.1,3);updateTransform(); });
+        document.getElementById('btnZoomOut').addEventListener('click', () => { state.hasCustomView=true; state.zoom=Math.max(state.zoom-0.1,0.25);updateTransform(); });
+        drawingArea.addEventListener('wheel', e => {
+            e.preventDefault();
+            state.hasCustomView=true;
+            const before = getMousePos(e);
+            const oldZoom = state.zoom;
+            state.zoom = e.deltaY < 0 ? Math.min(oldZoom + 0.05, 3) : Math.max(oldZoom - 0.05, 0.25);
+            const after = getMousePos(e);
+            state.panX += (after.x - before.x) * state.zoom;
+            state.panY += (after.y - before.y) * state.zoom;
+            updateTransform();
+        }, {passive:false});
+
+        // ===== FIREBASE: ARQUITECTURA SEPARADA =====
+
+        function unsubscribeActiveBoard() {
+            if (activeBoardUnsub) { try { activeBoardUnsub(); } catch(e){} activeBoardUnsub = null; }
+        }
+
+        function subscribeActiveBoard(board) {
+            unsubscribeActiveBoard();
+            if (!board || !board.isCloud || !board.cloudId || !db) return;
+
+            activeBoardUnsub = db.collection('boards').doc(board.cloudId).onSnapshot((doc) => {
+                // Si el documento fue eliminado, mostrar error y recargar
+                if (!doc.exists) {
+                    showNotification('El tablero fue eliminado en otro dispositivo', 'error');
+                    setTimeout(() => location.reload(), 1500);
+                    return;
+                }
+                if (localUpdates[board.cloudId]) return;
+
+                const data = doc.data();
+                const localBoard = state.boards.find(b => b.id === board.id);
+                if (!localBoard) {
+                    // Tablero no existe localmente, ignorar o recargar
+                    console.warn('Snapshot de tablero inexistente localmente');
+                    return;
+                }
+
+                const cloudObjs = JSON.stringify(data.objects || []);
+                const localObjs = JSON.stringify(localBoard.objects || []);
+                if (cloudObjs === localObjs && data.imageData === localBoard.imageData && data.name === localBoard.name) return;
+
+                localBoard.objects = data.objects || [];
+                localBoard.imageData = Object.prototype.hasOwnProperty.call(data, 'imageData') ? data.imageData : localBoard.imageData;
+                localBoard.name = data.name || localBoard.name;
+                normalizeBoard(localBoard);
+
+                const tabName = document.querySelector(`.tab-btn[data-board-id="${board.id}"] .tab-name`);
+                if (tabName) tabName.textContent = localBoard.name;
+
+                renderBoard(localBoard.id);
+            });
+        }
+
+        function scheduleCloudSave() {
+            const board = state.boards.find(b => b.id === state.activeBoardId);
+            if (!board || !board.isCloud || !board.cloudId || !db) return;
+            clearTimeout(cloudSaveTimeout);
+            localUpdates[board.cloudId] = true;
+            cloudSaveTimeout = setTimeout(() => {
+                delete localUpdates[board.cloudId];
+                saveBoardToCloud(board.id);
+            }, 800);
+        }
+
+        async function saveBoardToCloud(boardId) {
+            const board = state.boards.find(b => b.id === boardId);
+            if (!board || !board.isCloud || !board.cloudId || !db) return;
+            normalizeBoard(board);
+            try {
+                await db.collection('boards').doc(board.cloudId).set({
+                    name: board.name, updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    imageData: board.imageData || null, objects: board.objects || [],
+                    zoom: firebase.firestore.FieldValue.delete(),
+                    panX: firebase.firestore.FieldValue.delete(),
+                    panY: firebase.firestore.FieldValue.delete()
+                }, { merge: true });
+            } catch(err) { console.error('Firestore error:', err); }
+        }
+
+        // SUBIR A LA NUBE: Solo este botón crea tableros en Firestore
+        document.getElementById('btnSyncCloud').addEventListener('click', async () => {
+            if (!db) { showNotification('Firebase no configurado', 'error'); return; }
+            const board = state.boards.find(b => b.id === state.activeBoardId);
+            if (!board) return;
+            if (board.isCloud) { showNotification('Ya está en la nube ☁️'); saveBoardToCloud(board.id); return; }
+
+            const cloudId = `board_${Date.now()}`;
+            board.isCloud = true; board.cloudId = cloudId;
+            await saveBoardToCloud(board.id);
+
+            const tabEl = document.querySelector(`.tab-btn[data-board-id="${board.id}"]`);
+            if (tabEl) { tabEl.remove(); createTab(board.id); }
+            subscribeActiveBoard(board);
+            // Ahora que es nube, se remueve de localStorage al siguiente saveToLocal()
+            saveToLocal();
+            showNotification('Subido a la nube ☁️');
+        });
+
+        // Cargar tableros de la nube SOLO al iniciar (una vez)
+        async function loadCloudBoards() {
+            if (!db) return;
+            try {
+                const snapshot = await db.collection('boards').orderBy('updatedAt', 'desc').get();
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const exists = state.boards.find(b => b.cloudId === doc.id);
+                    if (!exists) {
+                        const id = `cloud_${doc.id}`;
+                        state.boards.push(normalizeBoard({
+                            id, name: data.name || 'Tablero nube',
+                            imageData: data.imageData, objects: data.objects || [],
+                            isCloud: true, cloudId: doc.id
+                        }));
+                        state.history[id] = []; state.historyIndex[id] = -1;
+                        createTab(id);
+                        if (state.activeBoardId === id) subscribeActiveBoard(state.boards.find(b=>b.id===id));
+                    }
+                });
+            } catch(err) { console.warn('Error cargando nube:', err); }
+        }
+
+        // ===== TECLADO =====
+        document.addEventListener('keydown', e => {
+            if(textOverlay.style.display==='block') return;
+            if(e.code==='Space'){state.spacePressed=true;canvas.style.cursor='grab';e.preventDefault();}
+            if(e.ctrlKey||e.metaKey){if(e.key.toLowerCase()==='z'){e.preventDefault();if(e.shiftKey)redo();else undo();} if(e.key.toLowerCase()==='y'){e.preventDefault();redo();} return;}
+            if(e.key==='Delete'||e.key==='Backspace'){if(state.selectedObject) deleteSelectedObject(); return;}
+            if(e.key==='Enter'&&state.selectedObject?.type==='text'){e.preventDefault();editSelectedText();return;}
+            const map={b:'btnDraw',e:'btnEraser',t:'btnText',l:'btnLine',r:'btnRect',c:'btnCircle',v:'btnSelect'}; if(map[e.key.toLowerCase()]) document.getElementById(map[e.key.toLowerCase()]).click();
+        });
+        document.addEventListener('keyup', e => { if(e.code==='Space'){state.spacePressed=false;updateCursorStyle();} });
+
+        tabAdd.addEventListener('click', () => createBoard());
+
+        // ===== MODAL =====
+        let modalCallback = null;
+        function showModal(title, message, style, onConfirm) {
+            if (typeof style === 'function') { onConfirm = style; style = 'danger'; }
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalMessage').textContent = message;
+            modalCallback = onConfirm;
+            modalConfirm.className = `modal-btn ${style || 'primary'}`;
+            modalConfirm.textContent = style === 'danger' ? 'Eliminar' : 'Confirmar';
+            modalOverlay.classList.add('show');
+        }
+        function closeModal() { modalOverlay.classList.remove('show'); modalCallback = null; }
+        modalCancel.addEventListener('click', closeModal);
+        modalConfirm.addEventListener('click', async () => {
+            if (!modalCallback) { closeModal(); return; }
+            modalConfirm.disabled = true;
+            try {
+                await modalCallback();
+                closeModal();
+            } catch (err) {
+                console.error('Modal action error:', err);
+                showNotification('No se pudo completar la acción', 'error');
+            } finally {
+                modalConfirm.disabled = false;
+            }
+        });
+        modalOverlay.addEventListener('click', (e) => { if (e.target === modalOverlay) closeModal(); });
+
+        function showNotification(m,type='success'){notification.textContent=m;notification.className='notification'+(type==='error'?' error':'');notification.classList.add('show');setTimeout(()=>notification.classList.remove('show'),2000);}
+
+        // LOCALSTORAGE: Solo guarda tableros LOCALES (no cloud)
+        function saveToLocal() {
+            const localBoards = state.boards.filter(b => !b.isCloud).map(b => normalizeBoard(b));
+            localStorage.setItem('glassboard_local_boards', JSON.stringify(localBoards));
+            // Guardar el ID del tablero activo solo si es local
+            const active = state.boards.find(b => b.id === state.activeBoardId);
+            if (active && !active.isCloud) {
+                localStorage.setItem('glassboard_active', state.activeBoardId);
+            } else {
+                // Si el activo es nube, guardar null para localStorage
+                localStorage.setItem('glassboard_active', state.boards.filter(b=>!b.isCloud)[0]?.id || '');
+            }
+            localStorage.setItem('glassboard_counter', state.boardIdCounter);
+        }
+
+        function loadFromStorage() {
+            const sB = localStorage.getItem('glassboard_local_boards');
+            const sA = localStorage.getItem('glassboard_active');
+            const sC = localStorage.getItem('glassboard_counter');
+            let loaded = false;
+
+            if (sB) {
+                try {
+                    const s = JSON.parse(sB);
+                    if (Array.isArray(s) && s.length > 0) {
+                        state.boards = []; state.boardIdCounter = parseInt(sC) || 0;
+                        state.history = {}; state.historyIndex = {};
+                        s.forEach(d => {
+                            // Asegurar que no tenga isCloud=true
+                            d.isCloud = false; d.cloudId = null;
+                            state.boards.push(normalizeBoard(d));
+                            state.history[d.id] = []; state.historyIndex[d.id] = -1;
+                            createTab(d.id);
+                        });
+                        const targetId = sA && state.boards.find(x => x.id === sA) ? sA : state.boards[0].id;
+                        switchBoard(targetId);
+                        loaded = true;
+                    }
+                } catch(e) {}
+            }
+            if (!loaded) createBoard('Tablero 1');
+            setTimeout(() => { saveCurrentBoard(); saveState(); }, 200);
+            // Cargar nubes DESPUÉS de locales
+            setTimeout(loadCloudBoards, 600);
+        }
+
+        loadFromStorage();
+        window.addEventListener('beforeunload', () => { saveCurrentBoard(); saveToLocal(); if(state.activeBoardId) saveBoardToCloud(state.activeBoardId); });
+    })();
+    </script>
+</body>
+</html>

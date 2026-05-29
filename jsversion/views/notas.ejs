@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Notas</title>
+    <link rel="stylesheet" href="static/styles.css">
+    <link rel="icon" href="resources/docu.png" type="image/png">
+</head>
+<body>
+    <header>
+        <div id="search-bar">
+            <input type="text" placeholder="Search" id="buscador" maxlength="50" autocomplete="off">
+            <div id="borrar">X</div>
+        </div>
+        <div id="lupa">🔍</div>
+        <div id="notas">➕</div>
+        <div id="salir">🔙</div>
+        <div id="configbtn">⚙️</div>
+    </header>
+    <div id="configdisplay">
+        <h2>Ajustes</h2>
+        <span><span>Version: </span><span id="version">V</span> <span></span></span>
+    </div>
+
+    <div id="preview">
+        <button class="btn-preview-delete" onclick="delPreview()"><strong>X</strong></button>
+        <button class="btn-preview-download" onclick="descargarImagen()">🗂️</button>
+        <img class="preview-img" id="previewimg">
+    </div>
+    <div id="loading">
+        <div class="loading-text">Cargando 📂</div>
+    </div>
+    <div id="addnote">
+        <div class="modal-header" onclick="Alternar(addnote)">Nueva nota - X</div>
+        <form class="modal-form" onsubmit="event.preventDefault();subir()">
+            <div class="input-row">
+                <input class="input-title" type="text" placeholder="Titulo" id="txttitulo" required autocomplete="off">  
+                <button type="button" class="btn-camera" onclick="document.getElementById('inputFile').click()">📸</button>
+            </div>
+            <textarea class="textarea-note textarea-resizable" placeholder="Nota" id="txttext" required spellcheck="false"></textarea>
+            <input id="inputFile" type="file" multiple accept="image/*" style="display: none;">
+            <div id="galeria"></div>
+            <button class="btn-save" type="submit"><strong>Guardar</strong></button>
+        </form>
+    </div>
+    <div id="editnote">
+        <div class="modal-header" onclick="Alternar(editdiv)">Editar nota - X</div>
+        <form class="modal-form" onsubmit="event.preventDefault();seditar()">
+            <div class="input-row">
+                <input class="input-title" type="text" placeholder="Titulo" id="edittitulo" required autocomplete="off">
+                <button type="button" class="btn-camera" onclick="document.getElementById('editinputFile').click()">📸</button>
+            </div>
+            <textarea class="textarea-note textarea-resizable" placeholder="Nota" id="edittext" required spellcheck="false"></textarea>
+            <input id="editinputFile" type="file" multiple accept="image/*" style="display: none;">    
+            <div id="editgaleria"></div>
+            <button class="btn-save" type="submit"><strong>Guardar</strong></button>
+        </form>
+    </div>
+    <div class="note-container" id="note-container">
+        <div class="content-note" id="cargademensajes"><strong class="text-center">Cargando Elementos... 💾</strong></div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <script src="static/notas.js"></script>
+    <script src="static/customizable.js"></script>
+</body>
+</html>

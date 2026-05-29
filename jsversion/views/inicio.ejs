@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Page</title>
+    <link rel="stylesheet" href="static/styles.css">
+    <link rel="icon" href="resources/docu.png" type="image/png">
+</head>
+<body>
+    <header>
+        <div id="search-bar">
+            <input type="text" placeholder="Search" id="buscador" maxlength="50" autocomplete="off">
+            <div id="borrar">X</div>
+        </div>
+        <div id="lupa">🔍</div>
+        <div id="notas">📄</div>
+        <div id="salir">✖️</div>
+        <div id="configbtn">⚙️</div>
+    </header>
+    <div id="configdisplay">
+        <h2>Ajustes</h2>
+        <span><span>Version: </span><span id="version">V</span> <span></span></span>
+    </div>
+
+    <form onsubmit="acces(event)" class="join" id="joinform">
+        <div style="font-family: 'Courier New', Courier, monospace; font-size: 20px; padding: 5px; color: white;">Inicia sesion</div>
+        <div class="inputs">
+            <input class="pass" type="password" id="contraseña" placeholder="Contraseña" maxlength="30" autocomplete="off" required>
+            <button class="verbtn" type="button" onclick="toggle()">Ver</button>
+        </div>
+        <button class="btn" type="submit">Continuar</button>
+    </form>
+
+    <div class="container" id="container">
+        <h1>Colegio 🏫</h1>
+        <a href="https://serpaweres.github.io/extras/agendas">Agenda</a>
+        <a href="https://edi-unoi-co.stn-neds.com/ts/view/access">Santillana</a>
+        <a href="https://informaticasagrado91011.blogspot.com">Blog Jose Torres</a>
+        <h1>Tareas 📚</h1>
+        <a href="https://www.canva.com/design/DAHCEkO7pUc/MfD0-B6KTPSHpMqAOrBrgQ/edit?utm_content=DAHCEkO7pUc&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton">Portafolio Ética</a>
+        <a href="https://cafeteramovil1.blogspot.com">Mi blog</a>
+        <a href="https://robotcafetera2.blogspot.com">Blog Ariza</a>
+        <h1>Render 💻</h1>
+        <a href="https://serpaweres.github.io/redirect/corform.html">Corform</a>
+        <a href="https://serpaweres.github.io/redirect/formofnames.html">FormOfNames</a>
+        <a href="https://serpaweres.github.io/redirect/songaudio.html">SongAudio</a>
+        <h1>Juegos 🎮</h1>
+        <a href="https://roblox.com/es/home">Roblox</a>
+        <a href="https://www.roblox.com/es/games/7007776787/Una-Asombrosa-aventura#!/store">Mis Pases</a>
+        <a href="https://www.roblox.com/es/games/98971033217107/Lugar-de-Mili-468798#!/store">Pases Nina</a>
+        <a href="https://www.roblox.com/es/games/88064213855773/Lugar-de-Lizzy00275#!/store">Pases Lizzy</a>
+        <a href="https://serpaweres.github.io/extras/rbxcalculator">TaxCalculator</a>
+        <h1>Personal 🔓</h1>
+        <a href="https://gmail.com">Gmail ✉️</a>
+        <a href="https://onedrive.live.com">One Drive ☁️</a>
+        <a href="https://youtube.com">YouTube ▶️</a>
+        <a href="https://web.whatsapp.com">Whatsapp Web 🟢</a>
+        <a href="https://chatgpt.com">Chat gpt 🔳</a>
+        <a href="/boards">Boards</a>
+        <a href="https://serpaweres.github.io/extras/songs/">Songs</a>
+        <a href="https://serpaweres.github.io/start">Start</a>
+    </div>
+    <script src="static/scripts.js"></script>
+    <script src="static/customizable.js"></script>
+</body>
+</html>
