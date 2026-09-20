@@ -1,7 +1,7 @@
 const configbtn = document.getElementById('configbtn')
 const configdisplay = document.getElementById('configdisplay')
 
-const version = '1.2.6'
+const version = '1.2.7'
 const versionin = document.getElementById('version')
 
 document.addEventListener('DOMContentLoaded', () => {
