@@ -8,19 +8,22 @@
     <link rel="icon" href="resources/docu.png" type="image/png">
 </head>
 <body>
-    <header>
+    <header style="display: flex;">
         <div id="search-bar">
-            <input type="text" placeholder="Search" id="buscador" maxlength="50" autocomplete="off">
+            <input type="text" placeholder="Buscar nota" id="buscador" maxlength="50" autocomplete="off">
             <div id="borrar">X</div>
         </div>
         <div id="lupa">🔍</div>
         <div id="notas">➕</div>
+        <!-- NUEVO: Botón de gestión de usuarios (solo visible para admin) -->
+        <div id="adminbtn" style="display: none; cursor: pointer;">👤</div>
         <div id="salir">🔙</div>
         <div id="configbtn">⚙️</div>
     </header>
+
     <div id="configdisplay">
         <h2>Ajustes</h2>
-        <span><span>Version: </span><span id="version">V</span> <span></span></span>
+        <span><span>Versión: </span><span id="version">V1.0</span></span>
     </div>
 
     <div id="preview">
@@ -28,14 +31,17 @@
         <button class="btn-preview-download" onclick="descargarImagen()">🗂️</button>
         <img class="preview-img" id="previewimg">
     </div>
+
     <div id="loading">
         <div class="loading-text">Cargando 📂</div>
     </div>
+
+    <!-- Modal Nueva Nota -->
     <div id="addnote">
         <div class="modal-header" onclick="Alternar(addnote)">Nueva nota - X</div>
         <form class="modal-form" onsubmit="event.preventDefault();subir()">
             <div class="input-row">
-                <input class="input-title" type="text" placeholder="Titulo" id="txttitulo" required autocomplete="off">  
+                <input class="input-title" type="text" placeholder="Título" id="txttitulo" required autocomplete="off">  
                 <button type="button" class="btn-camera" onclick="document.getElementById('inputFile').click()">📸</button>
             </div>
             <textarea class="textarea-note textarea-resizable" placeholder="Nota" id="txttext" required spellcheck="false"></textarea>
@@ -44,11 +50,13 @@
             <button class="btn-save" type="submit"><strong>Guardar</strong></button>
         </form>
     </div>
+
+    <!-- Modal Editar Nota -->
     <div id="editnote">
         <div class="modal-header" onclick="Alternar(editdiv)">Editar nota - X</div>
         <form class="modal-form" onsubmit="event.preventDefault();seditar()">
             <div class="input-row">
-                <input class="input-title" type="text" placeholder="Titulo" id="edittitulo" required autocomplete="off">
+                <input class="input-title" type="text" placeholder="Título" id="edittitulo" required autocomplete="off">
                 <button type="button" class="btn-camera" onclick="document.getElementById('editinputFile').click()">📸</button>
             </div>
             <textarea class="textarea-note textarea-resizable" placeholder="Nota" id="edittext" required spellcheck="false"></textarea>
@@ -57,12 +65,32 @@
             <button class="btn-save" type="submit"><strong>Guardar</strong></button>
         </form>
     </div>
+
+    <!-- NUEVO: Modal Administrar Permisos (Solo Admin) -->
+    <!-- Modal Administrar Permisos (Estilizado) -->
+    <!-- Modal Administrar Permisos -->
+    <div id="permisosnote" class="modal-permisos">
+        <div class="modal-permisos-header">
+            <strong>🔑 Gestor de Permisos</strong>
+            <button type="button" class="modal-permisos-close" onclick="cerrarPermisos()">✕</button>
+        </div>
+
+        <!-- Barra de búsqueda de usuarios -->
+        <input type="text" id="buscar-usuario-permiso" class="input-permisos-search" placeholder="🔍 Buscar usuario..." autocomplete="off">
+
+        <div id="permisos-lista-usuarios" class="modal-permisos-body">
+            <!-- Lista dinámica de usuarios -->
+        </div>
+        <button type="button" id="btn-guardar-permisos" class="btn-save" style="width: 100%; margin-top: 6px;">Guardar Permisos</button>
+    </div>
+
     <div class="note-container" id="note-container">
         <div class="content-note" id="cargademensajes"><strong class="text-center">Cargando Elementos... 💾</strong></div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
     <script src="static/notas.js"></script>
     <script src="static/customizable.js"></script>
 </body>

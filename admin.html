@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Usuarios - Admin</title>
+    <link rel="stylesheet" href="static/styles.css">
+    <link rel="icon" href="resources/docu.png" type="image/png">
+    <style>
+        /* Ajustes específicos de maquetación para la vista Admin */
+        #configdisplay {
+            display: flex !important;
+            width: 320px;
+            max-width: 90vw;
+            max-height: 80vh;
+            margin-top: 60px;
+            padding: 20px 16px;
+            box-sizing: border-box;
+            overflow: hidden;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #configdisplay * {
+            box-sizing: border-box;
+        }
+
+        #user-form {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            align-items: center;
+        }
+
+        #user-form .pass, 
+        #user-form .btn {
+            width: 100%;
+            margin: 0;
+        }
+
+        /* Contenedor dinámico con scroll para usuarios */
+        #users-list {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 220px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        /* Estilo de la barra de scroll en la lista de usuarios */
+        #users-list::-webkit-scrollbar {
+            width: 4px;
+        }
+        #users-list::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        #users-list::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.25);
+            border-radius: 4px;
+        }
+
+        /* Ajuste de tarjeta de usuario */
+        .user-card {
+            width: 100% !important;
+            margin: 0 !important;
+            border-radius: var(--radius-sm) !important;
+        }
+    </style>
+</head>
+<body>
+    <header style="display: flex;">
+        <div id="search-bar">
+            <input type="text" placeholder="Buscar usuario" id="buscador" maxlength="50" autocomplete="off">
+            <div id="borrar">X</div>
+        </div>
+        <div id="lupa">🔍</div>
+        <div id="notas">📄</div>
+        <div id="salir">⬅️</div>
+    </header>
+
+    <div id="configdisplay">
+        <h2 style="margin-top: 0; margin-bottom: 12px; font-size: 20px; text-align: center;">Gestión Dashusers</h2>
+        
+        <form id="user-form">
+            <input type="hidden" id="user-id">
+            <input class="pass" type="text" id="admin-user" placeholder="Nuevo Usuario" required autocomplete="off">
+            <input class="pass" type="text" id="admin-pass" placeholder="Nueva Contraseña" required autocomplete="off">
+            <button class="btn" type="submit" id="btn-save-user">Guardar Usuario</button>
+        </form>
+
+        <hr style="width: 100%; border: 0.5px solid var(--glass-border); margin: 14px 0;">
+
+        <div id="users-list">
+            <!-- Lista dinámica de usuarios -->
+        </div>
+    </div>
+
+    <script type="module" src="static/admin.js"></script>
+</body>
+</html>

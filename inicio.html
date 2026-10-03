@@ -15,6 +15,8 @@
         </div>
         <div id="lupa">🔍</div>
         <div id="notas">📄</div>
+        <!-- Botón del Panel Admin -->
+        <div id="adminbtn" onclick="location.href='admin.html'">👤</div>
         <div id="salir">✖️</div>
         <div id="configbtn">⚙️</div>
     </header>
@@ -24,11 +26,14 @@
     </div>
 
     <form onsubmit="acces(event)" class="join" id="joinform">
-        <div style="font-family: 'Courier New', Courier, monospace; font-size: 20px; padding: 5px; color: white;">Inicia sesion</div>
+        <div style="font-family: 'Courier New', Courier, monospace; font-size: 20px; padding: 5px; color: white;">Inicia sesion</div><br>
+        <div class="inputs">
+            <input class="pass" type="text" id="usuario" placeholder="Usuario" maxlength="30" autocomplete="off" required>
+        </div>
         <div class="inputs">
             <input class="pass" type="password" id="contraseña" placeholder="Contraseña" maxlength="30" autocomplete="off" required>
-            <button class="verbtn" type="button" onclick="toggle()">Ver</button>
-        </div>
+            <button class="verbtn" type="button" onclick="toggle()">VER</button>
+        </div><br>
         <button class="btn" type="submit">Continuar</button>
     </form>
 
@@ -62,7 +67,7 @@
         <a href="https://serpaweres.github.io/extras/songs/">Songs</a>
         <a href="https://serpaweres.github.io/start">Start</a>
     </div>
-    <script src="static/scripts.js"></script>
+    <script type="module" src="static/scripts.js"></script>
     <script src="static/customizable.js"></script>
 </body>
 </html>
