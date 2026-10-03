@@ -138,7 +138,8 @@ db.ref('notas').on('value', (data) => {
                     const permBtn = document.createElement('button');
                     permBtn.textContent = '🔑 Permisos';
                     permBtn.className = 'btn-tarjeta-editar';
-                    permBtn.style.background = '#e67e22';
+                    permBtn.style.background = "linear-gradient(135deg, rgba(255, 183, 0, 0.6), rgba(255, 255, 255, 0.2), rgba(255, 130, 0, 0.6))";
+                    permBtn.style.border = "1px solid rgba(255, 145, 0, 0.4)";
                     permBtn.onclick = function() {
                         abrirGestorPermisos(key, usuariosPermitidos);
                     };
